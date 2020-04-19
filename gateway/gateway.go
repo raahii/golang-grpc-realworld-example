@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"log"
 	"net/http"
 
 	"github.com/golang/glog"
@@ -9,7 +10,7 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
-	gw "github.com/raahii/realworld-grpc/proto"
+	gw "github.com/raahii/golang-grpc-realworld-example/proto"
 )
 
 var (
@@ -21,13 +22,26 @@ func run() error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	mux := runtime.NewServeMux()
+	ropts := []runtime.ServeMuxOption{
+		runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.JSONPb{OrigName: true, EmitDefaults: true}),
+	}
+
+	mux := runtime.NewServeMux(ropts...)
 	opts := []grpc.DialOption{grpc.WithInsecure()}
+
+	// greeter
 	err := gw.RegisterGreeterHandlerFromEndpoint(ctx, mux, *echoEndpoint, opts)
 	if err != nil {
 		return err
 	}
 
+	// users
+	err = gw.RegisterUsersHandlerFromEndpoint(ctx, mux, *echoEndpoint, opts)
+	if err != nil {
+		return err
+	}
+
+	log.Printf("starting gateway server on port 8080\n")
 	return http.ListenAndServe(":8080", mux)
 }
 

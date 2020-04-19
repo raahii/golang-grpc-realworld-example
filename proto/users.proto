@@ -1,0 +1,29 @@
+syntax = "proto3";
+package proto;
+
+option go_package = ".;proto";
+
+import "google/api/annotations.proto";
+
+message Profile {
+  string username = 1;
+  string bio = 2;
+  string image = 3;
+}
+
+service Users {
+  rpc ShowProfile (ShowProfileRequest) returns (ShowProfileResponse) {
+    option (google.api.http) = {
+      get: "/profiles/{username}"
+    };
+  }
+}
+
+message ShowProfileRequest {
+  string username = 1;
+}
+
+
+message ShowProfileResponse {
+  Profile profile = 1;
+}

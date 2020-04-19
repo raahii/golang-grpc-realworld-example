@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "helloworld.proto",
+    "title": "users.proto",
     "version": "version not set"
   },
   "consumes": [
@@ -11,14 +11,14 @@
     "application/json"
   ],
   "paths": {
-    "/hello": {
+    "/profiles/{username}": {
       "get": {
-        "operationId": "SayHello",
+        "operationId": "ShowProfile",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protoHelloReply"
+              "$ref": "#/definitions/protoShowProfileResponse"
             }
           },
           "default": {
@@ -30,24 +30,38 @@
         },
         "parameters": [
           {
-            "name": "name",
-            "in": "query",
-            "required": false,
+            "name": "username",
+            "in": "path",
+            "required": true,
             "type": "string"
           }
         ],
         "tags": [
-          "Greeter"
+          "Users"
         ]
       }
     }
   },
   "definitions": {
-    "protoHelloReply": {
+    "protoProfile": {
       "type": "object",
       "properties": {
-        "message": {
+        "username": {
           "type": "string"
+        },
+        "bio": {
+          "type": "string"
+        },
+        "image": {
+          "type": "string"
+        }
+      }
+    },
+    "protoShowProfileResponse": {
+      "type": "object",
+      "properties": {
+        "profile": {
+          "$ref": "#/definitions/protoProfile"
         }
       }
     },

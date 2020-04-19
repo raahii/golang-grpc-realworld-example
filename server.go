@@ -1,14 +1,13 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"net"
 	"os"
 
-	"github.com/jinzhu/gorm"
 	"github.com/raahii/golang-grpc-realworld-example/db"
+	"github.com/raahii/golang-grpc-realworld-example/handler"
 	pb "github.com/raahii/golang-grpc-realworld-example/proto"
 	"google.golang.org/grpc"
 )
@@ -16,20 +15,6 @@ import (
 const (
 	port = ":50051"
 )
-
-type Logger interface {
-	Printf(string, ...interface{})
-}
-
-type server struct {
-	logger Logger
-	db     *gorm.DB
-}
-
-func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
-	log.Printf("Received: %v", in.GetName())
-	return &pb.HelloReply{Message: "Hello " + in.GetName()}, nil
-}
 
 func main() {
 	l := log.New(os.Stdout, "", log.Ldate|log.Ltime|log.Lshortfile)
@@ -40,13 +25,16 @@ func main() {
 	}
 	db.AutoMigrate(d)
 
+	h := handler.New(l, d)
+
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
 		l.Fatal(fmt.Errorf("failed to listen: %w", err))
 	}
 
 	s := grpc.NewServer()
-	pb.RegisterGreeterServer(s, &server{logger: l, db: d})
+	pb.RegisterGreeterServer(s, h)
+	pb.RegisterUsersServer(s, h)
 	l.Printf("starting server on port %s\n", port)
 	if err := s.Serve(lis); err != nil {
 		l.Fatal(fmt.Errorf("failed to serve: %w", err))
