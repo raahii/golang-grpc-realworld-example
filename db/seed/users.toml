@@ -1,0 +1,15 @@
+[[users]]
+  id = "23476c02-2364-4f54-94d3-b41b4d4d0d9b"
+  username = "foo"
+  email = "foo@example.com"
+  password = "xxxxxx"
+  created_at = 1979-05-27T07:32:00
+  updated_at = 1979-05-27T07:32:00
+
+[[users]]
+  id = "ede41190-eb16-4676-9cc9-6fdb368b435b"
+  username = "bar"
+  email = "bar@example.com"
+  password = "yyyyyy"
+  created_at = 1979-05-27T07:32:00
+  updated_at = 1979-05-27T07:32:00
