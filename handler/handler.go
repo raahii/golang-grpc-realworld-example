@@ -2,27 +2,22 @@ package handler
 
 import (
 	"context"
-	"log"
 
 	"github.com/jinzhu/gorm"
 	pb "github.com/raahii/golang-grpc-realworld-example/proto"
+	"github.com/rs/zerolog"
 )
 
-type Logger interface {
-	Printf(string, ...interface{})
-	Fatal(...interface{})
-}
-
 type Handler struct {
-	logger Logger
+	logger *zerolog.Logger
 	db     *gorm.DB
 }
 
-func New(l Logger, d *gorm.DB) *Handler {
+func New(l *zerolog.Logger, d *gorm.DB) *Handler {
 	return &Handler{logger: l, db: d}
 }
 
-func (s *Handler) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
-	log.Printf("Received: %v", in.GetName())
+func (h *Handler) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
+	h.logger.Info().Msgf("Received: %v", in.GetName())
 	return &pb.HelloReply{Message: "Hello " + in.GetName()}, nil
 }

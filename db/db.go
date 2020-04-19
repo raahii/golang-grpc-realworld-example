@@ -9,7 +9,6 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
-	"github.com/k0kubun/pp"
 	"github.com/raahii/golang-grpc-realworld-example/model"
 )
 
@@ -60,8 +59,6 @@ func Seed(db *gorm.DB) error {
 	if _, err := toml.Decode(string(bs), &users); err != nil {
 		return err
 	}
-
-	pp.Println(users.Users)
 
 	for _, u := range users.Users {
 		if err := db.Create(&u).Error; err != nil {
