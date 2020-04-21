@@ -11,10 +11,35 @@ message Profile {
   string image = 3;
 }
 
+message User {
+  string username = 1;
+  string email = 2;
+  string password = 3;
+  string bio = 4;
+  string image = 5;
+  string token = 6;
+}
+
+
+message CreatedUser {
+  string email = 1;
+  string token = 2;
+  string username = 3;
+  string bio = 4;
+  string image = 5;
+}
+
 service Users {
   rpc ShowProfile (ShowProfileRequest) returns (ShowProfileResponse) {
     option (google.api.http) = {
       get: "/profiles/{username}"
+    };
+  }
+
+  rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {
+    option (google.api.http) = {
+      post: "/users"
+      body: "*"
     };
   }
 }
@@ -26,4 +51,14 @@ message ShowProfileRequest {
 
 message ShowProfileResponse {
   Profile profile = 1;
+}
+
+
+message CreateUserRequest {
+  User user = 1;
+}
+
+
+message CreateUserResponse {
+  CreatedUser user = 1;
 }
