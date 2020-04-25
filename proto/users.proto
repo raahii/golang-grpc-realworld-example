@@ -17,9 +17,7 @@ message User {
   string password = 3;
   string bio = 4;
   string image = 5;
-  string token = 6;
 }
-
 
 message CreatedUser {
   string email = 1;
