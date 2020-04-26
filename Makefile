@@ -11,3 +11,5 @@ proto:
 		--swagger_out=logtostderr=true:./doc \
 		./proto/*.proto
 
+test:
+	go test -v ./handler

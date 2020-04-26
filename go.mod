@@ -11,6 +11,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway v1.14.4
 	github.com/jinzhu/gorm v1.9.12
 	github.com/rs/zerolog v1.18.0
+	github.com/stretchr/testify v1.5.1 // indirect
 	golang.org/x/crypto v0.0.0-20191205180655-e7c4368fe9dd
 	golang.org/x/net v0.0.0-20191002035440-2ec189313ef0
 	golang.org/x/sys v0.0.0-20200223170610-d5e6a3e2c0ae // indirect

@@ -1,7 +1,6 @@
 package db
 
 import (
-	"fmt"
 	"io/ioutil"
 
 	"os"
@@ -13,28 +12,31 @@ import (
 )
 
 func New() (*gorm.DB, error) {
-	db, err := gorm.Open("sqlite3", "./db/realworld.db")
+	d, err := gorm.Open("sqlite3", "./db/data/realworld.db")
 	if err != nil {
 		return nil, err
 	}
-	db.DB().SetMaxIdleConns(3)
-	db.LogMode(true)
 
-	return db, nil
+	d.DB().SetMaxIdleConns(3)
+	d.LogMode(false)
+
+	return d, nil
 }
 
-func TestDB() *gorm.DB {
-	db, err := gorm.Open("sqlite3", "./db/realworld_test.db")
+func NewTestDB() (*gorm.DB, error) {
+	d, err := gorm.Open("sqlite3", "../db/data/realworld_test.db")
 	if err != nil {
-		fmt.Println("storage err: ", err)
+		return nil, err
 	}
-	db.DB().SetMaxIdleConns(3)
-	db.LogMode(false)
-	return db
+
+	d.DB().SetMaxIdleConns(3)
+	d.LogMode(false)
+
+	return d, nil
 }
 
 func DropTestDB() error {
-	if err := os.Remove("./db/realworld_test.db"); err != nil {
+	if err := os.Remove("./db/data/realworld_test.db"); err != nil {
 		return err
 	}
 	return nil

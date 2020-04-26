@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// show user profile
 func (h *Handler) ShowProfile(ctx context.Context, req *pb.ShowProfileRequest) (*pb.ShowProfileResponse, error) {
 	h.logger.Info().Msgf("Show profile | req: %+v\n", req)
 
@@ -29,6 +30,7 @@ func (h *Handler) ShowProfile(ctx context.Context, req *pb.ShowProfileRequest) (
 	return &pb.ShowProfileResponse{Profile: &p}, nil
 }
 
+// create new user
 func (h *Handler) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
 	h.logger.Info().Msg("craete user")
 
@@ -42,19 +44,23 @@ func (h *Handler) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*p
 
 	err := u.Validate()
 	if err != nil {
-		msg := fmt.Sprintf("Validation error. %s", err)
-		return nil, status.Error(codes.InvalidArgument, msg)
+		err = fmt.Errorf("validation error: %w", err)
+		h.logger.Error().Err(err)
+		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	err = u.HashPassword()
 	if err != nil {
-		return nil, status.Error(codes.Aborted, "Internal sever error.")
+		err := fmt.Errorf("Failed to hash password, %w", err)
+		h.logger.Error().Err(err)
+		return nil, status.Error(codes.Aborted, err.Error())
 	}
 
 	err = h.db.Create(&u).Error
 	if err != nil {
-		msg := fmt.Sprintf("Failed to create user. %s", err)
-		return nil, status.Error(codes.Canceled, msg)
+		err := fmt.Errorf("Failed to create user. %w", err)
+		h.logger.Error().Err(err)
+		return nil, status.Error(codes.Canceled, err.Error())
 	}
 
 	return &pb.CreateUserResponse{
