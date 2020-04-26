@@ -35,13 +35,27 @@ func TestCreateUser(t *testing.T) {
 	h, cleaner := setUp(t)
 	defer cleaner(t)
 
+	fooUser := model.User{
+		Username: "foo",
+		Email:    "foo@example.com",
+		Password: "secret",
+	}
+	barUser := model.User{
+		Username: "bar",
+		Email:    "bar@example.com",
+		Password: "secret",
+		Bio:      "I'm foo!",
+		Image:    "https://golang.org/lib/godoc/images/go-logo-blue.svg",
+	}
+
 	tests := []struct {
 		title    string
 		req      *pb.CreateUserRequest
+		expected *model.User
 		hasError bool
 	}{
 		{
-			"success case: foo",
+			"create fooUser: success",
 			&pb.CreateUserRequest{
 				User: &pb.User{
 					Username: "foo",
@@ -49,10 +63,11 @@ func TestCreateUser(t *testing.T) {
 					Password: "secret",
 				},
 			},
+			&fooUser,
 			false,
 		},
 		{
-			"success case: bar",
+			"create barUser: success",
 			&pb.CreateUserRequest{
 				User: &pb.User{
 					Username: "bar",
@@ -62,10 +77,11 @@ func TestCreateUser(t *testing.T) {
 					Image:    "https://golang.org/lib/godoc/images/go-logo-blue.svg",
 				},
 			},
+			&barUser,
 			false,
 		},
 		{
-			"failure case: no username",
+			"create fooUser: no username",
 			&pb.CreateUserRequest{
 				User: &pb.User{
 					Username: "",
@@ -73,10 +89,11 @@ func TestCreateUser(t *testing.T) {
 					Password: "secret",
 				},
 			},
+			nil,
 			true,
 		},
 		{
-			"failure case: duplicated username",
+			"create fooUser: username already exists",
 			&pb.CreateUserRequest{
 				User: &pb.User{
 					Username: "foo",
@@ -84,21 +101,23 @@ func TestCreateUser(t *testing.T) {
 					Password: "secret",
 				},
 			},
+			nil,
 			true,
 		},
 		{
-			"failure case: no email",
+			"create fooUser: no email",
 			&pb.CreateUserRequest{
 				User: &pb.User{
-					Username: "hoge",
+					Username: "foo",
 					Email:    "",
 					Password: "secret",
 				},
 			},
+			nil,
 			true,
 		},
 		{
-			"failure case: duplicated email",
+			"create fooUser: email already exists",
 			&pb.CreateUserRequest{
 				User: &pb.User{
 					Username: "hoge",
@@ -106,15 +125,34 @@ func TestCreateUser(t *testing.T) {
 					Password: "secret",
 				},
 			},
+			nil,
 			true,
 		},
 	}
 
 	for _, tt := range tests {
 		c := context.Background()
-		_, err := h.CreateUser(c, tt.req)
+		resp, err := h.CreateUser(c, tt.req)
 		if (err != nil) != tt.hasError {
 			t.Errorf("%s hasError %t, but got error: %v.", tt.title, tt.hasError, err)
+		}
+
+		if !tt.hasError {
+			if resp.User.Username != tt.expected.Username {
+				t.Errorf("%q worng Username, expected %q, got %q", tt.title, tt.expected.Username, resp.User.Username)
+			}
+			if resp.User.Email != tt.expected.Email {
+				t.Errorf("%q worng Email, expected %q, got %q", tt.title, tt.expected.Email, resp.User.Email)
+			}
+			if resp.User.Bio != tt.expected.Bio {
+				t.Errorf("%q worng Bio, expected %q, got %q", tt.title, tt.expected.Bio, resp.User.Bio)
+			}
+			if resp.User.Image != tt.expected.Image {
+				t.Errorf("%q worng Image, expected %q, got %q", tt.title, tt.expected.Image, resp.User.Image)
+			}
+			if resp.User.Token == "" {
+				t.Errorf("token must not be empety")
+			}
 		}
 	}
 }
@@ -144,7 +182,7 @@ func TestLoginUser(t *testing.T) {
 		hasError bool
 	}{
 		{
-			"success case: login foo",
+			"login to fooUser: success",
 			&pb.LoginUserRequest{
 				User: &pb.User{
 					Email:    "foo@example.com",
@@ -153,6 +191,28 @@ func TestLoginUser(t *testing.T) {
 			},
 			&fooUser,
 			false,
+		},
+		{
+			"login to fooUser: wrong email",
+			&pb.LoginUserRequest{
+				User: &pb.User{
+					Email:    "foooo@example.com",
+					Password: "secret",
+				},
+			},
+			nil,
+			true,
+		},
+		{
+			"login to fooUser: wrong password",
+			&pb.LoginUserRequest{
+				User: &pb.User{
+					Email:    "foo@example.com",
+					Password: "secrets",
+				},
+			},
+			nil,
+			true,
 		},
 	}
 

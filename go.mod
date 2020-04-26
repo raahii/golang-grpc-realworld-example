@@ -11,11 +11,12 @@ require (
 	github.com/golang/protobuf v1.4.0
 	github.com/grpc-ecosystem/grpc-gateway v1.14.4
 	github.com/jinzhu/gorm v1.9.12
+	github.com/k0kubun/pp v3.0.1+incompatible
+	github.com/mattn/go-colorable v0.1.6 // indirect
 	github.com/rs/zerolog v1.18.0
 	github.com/stretchr/testify v1.5.1 // indirect
 	golang.org/x/crypto v0.0.0-20191205180655-e7c4368fe9dd
 	golang.org/x/net v0.0.0-20191002035440-2ec189313ef0
-	golang.org/x/sys v0.0.0-20200223170610-d5e6a3e2c0ae // indirect
 	golang.org/x/text v0.3.2 // indirect
 	google.golang.org/genproto v0.0.0-20200417142217-fb6d0575620b
 	google.golang.org/grpc v1.28.1
