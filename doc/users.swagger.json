@@ -11,36 +11,6 @@
     "application/json"
   ],
   "paths": {
-    "/profiles/{username}": {
-      "get": {
-        "operationId": "ShowProfile",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/protoShowProfileResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "username",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "Users"
-        ]
-      }
-    },
     "/users": {
       "post": {
         "operationId": "CreateUser",
@@ -48,7 +18,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protoCreateUserResponse"
+              "$ref": "#/definitions/protoUserResponse"
             }
           },
           "default": {
@@ -72,6 +42,38 @@
           "Users"
         ]
       }
+    },
+    "/users/login": {
+      "post": {
+        "operationId": "LoginUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoLoginUserRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Users"
+        ]
+      }
     }
   },
   "definitions": {
@@ -83,15 +85,15 @@
         }
       }
     },
-    "protoCreateUserResponse": {
+    "protoLoginUserRequest": {
       "type": "object",
       "properties": {
         "user": {
-          "$ref": "#/definitions/protoCreatedUser"
+          "$ref": "#/definitions/protoUser"
         }
       }
     },
-    "protoCreatedUser": {
+    "protoLoginedUser": {
       "type": "object",
       "properties": {
         "email": {
@@ -108,28 +110,6 @@
         },
         "image": {
           "type": "string"
-        }
-      }
-    },
-    "protoProfile": {
-      "type": "object",
-      "properties": {
-        "username": {
-          "type": "string"
-        },
-        "bio": {
-          "type": "string"
-        },
-        "image": {
-          "type": "string"
-        }
-      }
-    },
-    "protoShowProfileResponse": {
-      "type": "object",
-      "properties": {
-        "profile": {
-          "$ref": "#/definitions/protoProfile"
         }
       }
     },
@@ -150,6 +130,14 @@
         },
         "image": {
           "type": "string"
+        }
+      }
+    },
+    "protoUserResponse": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/protoLoginedUser"
         }
       }
     },
