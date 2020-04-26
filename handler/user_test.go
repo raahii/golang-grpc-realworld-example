@@ -128,6 +128,11 @@ func TestLoginUser(t *testing.T) {
 		Email:    "foo@example.com",
 		Password: "secret",
 	}
+	err := fooUser.HashPassword()
+	if err != nil {
+		t.Fatal("Failed to hash password")
+	}
+
 	if err := h.db.Create(&fooUser).Error; err != nil {
 		t.Fatalf("failed to create initial user record: %v", err)
 	}
