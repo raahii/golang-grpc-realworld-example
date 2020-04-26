@@ -41,6 +41,12 @@ func run() error {
 		return err
 	}
 
+	// profiles
+	err = gw.RegisterProfilesHandlerFromEndpoint(ctx, mux, *echoEndpoint, opts)
+	if err != nil {
+		return err
+	}
+
 	log.Printf("starting gateway server on port 8080\n")
 	return http.ListenAndServe(":8080", mux)
 }

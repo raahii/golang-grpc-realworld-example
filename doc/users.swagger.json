@@ -11,36 +11,6 @@
     "application/json"
   ],
   "paths": {
-    "/profiles/{username}": {
-      "get": {
-        "operationId": "ShowProfile",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/protoShowProfileResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response",
-            "schema": {
-              "$ref": "#/definitions/runtimeError"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "username",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "Users"
-        ]
-      }
-    },
     "/users": {
       "post": {
         "operationId": "CreateUser",
@@ -140,28 +110,6 @@
         },
         "image": {
           "type": "string"
-        }
-      }
-    },
-    "protoProfile": {
-      "type": "object",
-      "properties": {
-        "username": {
-          "type": "string"
-        },
-        "bio": {
-          "type": "string"
-        },
-        "image": {
-          "type": "string"
-        }
-      }
-    },
-    "protoShowProfileResponse": {
-      "type": "object",
-      "properties": {
-        "profile": {
-          "$ref": "#/definitions/protoProfile"
         }
       }
     },

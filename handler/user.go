@@ -11,26 +11,6 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// show user profile
-func (h *Handler) ShowProfile(ctx context.Context, req *pb.ShowProfileRequest) (*pb.ShowProfileResponse, error) {
-	h.logger.Info().Msgf("Show profile | req: %+v\n", req)
-
-	user := model.User{}
-	err := h.db.Where("username = ?", req.Username).First(&user).Error
-	if err != nil {
-		h.logger.Fatal().Err(fmt.Errorf("user not found: %w", err))
-		return nil, status.Error(codes.NotFound, "user was not found")
-	}
-
-	p := pb.Profile{
-		Username: user.Username,
-		Bio:      user.Bio,
-		Image:    user.Image,
-	}
-
-	return &pb.ShowProfileResponse{Profile: &p}, nil
-}
-
 // create new user
 func (h *Handler) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.UserResponse, error) {
 	h.logger.Info().Msg("craete user")
