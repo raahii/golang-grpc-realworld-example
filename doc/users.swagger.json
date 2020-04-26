@@ -48,7 +48,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protoCreateUserResponse"
+              "$ref": "#/definitions/protoUserResponse"
             }
           },
           "default": {
@@ -72,6 +72,38 @@
           "Users"
         ]
       }
+    },
+    "/users/login": {
+      "post": {
+        "operationId": "LoginUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/protoLoginUserRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Users"
+        ]
+      }
     }
   },
   "definitions": {
@@ -83,15 +115,15 @@
         }
       }
     },
-    "protoCreateUserResponse": {
+    "protoLoginUserRequest": {
       "type": "object",
       "properties": {
         "user": {
-          "$ref": "#/definitions/protoCreatedUser"
+          "$ref": "#/definitions/protoUser"
         }
       }
     },
-    "protoCreatedUser": {
+    "protoLoginedUser": {
       "type": "object",
       "properties": {
         "email": {
@@ -150,6 +182,14 @@
         },
         "image": {
           "type": "string"
+        }
+      }
+    },
+    "protoUserResponse": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/protoLoginedUser"
         }
       }
     },

@@ -19,7 +19,7 @@ message User {
   string image = 5;
 }
 
-message CreatedUser {
+message LoginedUser {
   string email = 1;
   string token = 2;
   string username = 3;
@@ -34,9 +34,16 @@ service Users {
     };
   }
 
-  rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {
+  rpc CreateUser (CreateUserRequest) returns (UserResponse) {
     option (google.api.http) = {
       post: "/users"
+      body: "*"
+    };
+  }
+
+  rpc LoginUser (LoginUserRequest) returns (UserResponse) {
+    option (google.api.http) = {
+      post: "/users/login"
       body: "*"
     };
   }
@@ -56,7 +63,11 @@ message CreateUserRequest {
   User user = 1;
 }
 
-
-message CreateUserResponse {
-  CreatedUser user = 1;
+message LoginUserRequest {
+  User user = 1;
 }
+
+message UserResponse {
+  LoginedUser user = 1;
+}
+
