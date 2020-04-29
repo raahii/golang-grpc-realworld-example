@@ -18,10 +18,19 @@ type Claims struct {
 }
 
 func GenerateToken(id uint) (string, error) {
+	return generateToken(id, time.Now())
+}
+
+func GenerateTokenWithTime(id uint, t time.Time) (string, error) {
+	// for test
+	return generateToken(id, t)
+}
+
+func generateToken(id uint, now time.Time) (string, error) {
 	claims := &Claims{
 		id,
 		jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Hour * 72).Unix(),
+			ExpiresAt: now.Add(time.Hour * 72).Unix(),
 		},
 	}
 

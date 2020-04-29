@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
@@ -277,18 +278,26 @@ func TestCurrentUser(t *testing.T) {
 
 	tests := []struct {
 		title    string
+		now      time.Time
 		expected *model.User
 		hasError bool
 	}{
 		{
-			"get fooUser",
+			"get fooUser: ok",
+			time.Now(),
 			&fooUser,
 			false,
+		},
+		{
+			"get fooUser: token expired",
+			time.Unix(0, 0),
+			&fooUser,
+			true,
 		},
 	}
 
 	for _, tt := range tests {
-		token, err := auth.GenerateToken(tt.expected.ID)
+		token, err := auth.GenerateTokenWithTime(tt.expected.ID, tt.now)
 		if err != nil {
 			t.Error(err)
 		}
