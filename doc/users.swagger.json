@@ -101,7 +101,21 @@
       "type": "object",
       "properties": {
         "user": {
-          "$ref": "#/definitions/protoUser"
+          "$ref": "#/definitions/protoCreateUserRequestUser"
+        }
+      }
+    },
+    "protoCreateUserRequestUser": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
         }
       }
     },
@@ -109,11 +123,22 @@
       "type": "object",
       "properties": {
         "user": {
-          "$ref": "#/definitions/protoUser"
+          "$ref": "#/definitions/protoLoginUserRequestUser"
         }
       }
     },
-    "protoLoginedUser": {
+    "protoLoginUserRequestUser": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
+    "protoUser": {
       "type": "object",
       "properties": {
         "email": {
@@ -133,31 +158,11 @@
         }
       }
     },
-    "protoUser": {
-      "type": "object",
-      "properties": {
-        "username": {
-          "type": "string"
-        },
-        "email": {
-          "type": "string"
-        },
-        "password": {
-          "type": "string"
-        },
-        "bio": {
-          "type": "string"
-        },
-        "image": {
-          "type": "string"
-        }
-      }
-    },
     "protoUserResponse": {
       "type": "object",
       "properties": {
         "user": {
-          "$ref": "#/definitions/protoLoginedUser"
+          "$ref": "#/definitions/protoUser"
         }
       }
     },

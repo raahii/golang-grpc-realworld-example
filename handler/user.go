@@ -12,16 +12,49 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// login user
+func (h *Handler) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (*pb.UserResponse, error) {
+	h.logger.Info().Msg("login user")
+
+	u := model.User{}
+	err := h.db.Where("email = ?", req.User.GetEmail()).First(&u).Error
+	if err != nil {
+		err = fmt.Errorf("failed to login due to wrong email: %w", err)
+		h.logger.Error().Err(err)
+		return nil, status.Error(codes.InvalidArgument, "invalid email or password")
+	}
+
+	if !u.CheckPassword(req.User.GetPassword()) {
+		h.logger.Error().Msgf("failed to login due to receive wrong password: %s", u.Email)
+		return nil, status.Error(codes.InvalidArgument, "invalid email or password")
+	}
+
+	token, err := auth.GenerateToken(u.ID)
+	if err != nil {
+		err := fmt.Errorf("Failed to create token. %w", err)
+		h.logger.Error().Err(err)
+		return nil, status.Error(codes.Aborted, "internal server error")
+	}
+
+	return &pb.UserResponse{
+		User: &pb.User{
+			Email:    u.Email,
+			Token:    token,
+			Username: u.Username,
+			Bio:      u.Bio,
+			Image:    u.Image,
+		},
+	}, nil
+}
+
 // create new user
 func (h *Handler) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.UserResponse, error) {
 	h.logger.Info().Msg("craete user")
 
 	u := model.User{
-		Username: req.User.Username,
-		Email:    req.User.Email,
-		Password: req.User.Password,
-		Bio:      req.User.Bio,
-		Image:    req.User.Image,
+		Username: req.User.GetUsername(),
+		Email:    req.User.GetEmail(),
+		Password: req.User.GetPassword(),
 	}
 
 	err := u.Validate()
@@ -53,42 +86,7 @@ func (h *Handler) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*p
 	}
 
 	return &pb.UserResponse{
-		User: &pb.LoginedUser{
-			Email:    u.Email,
-			Token:    token,
-			Username: u.Username,
-			Bio:      u.Bio,
-			Image:    u.Image,
-		},
-	}, nil
-}
-
-// login user
-func (h *Handler) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (*pb.UserResponse, error) {
-	h.logger.Info().Msg("login user")
-
-	u := model.User{}
-	err := h.db.Where("email = ?", req.User.Email).First(&u).Error
-	if err != nil {
-		err = fmt.Errorf("failed to login due to wrong email: %w", err)
-		h.logger.Error().Err(err)
-		return nil, status.Error(codes.InvalidArgument, "invalid email or password")
-	}
-
-	if !u.CheckPassword(req.User.Password) {
-		h.logger.Error().Msgf("failed to login due to receive wrong password: %s", u.Email)
-		return nil, status.Error(codes.InvalidArgument, "invalid email or password")
-	}
-
-	token, err := auth.GenerateToken(u.ID)
-	if err != nil {
-		err := fmt.Errorf("Failed to create token. %w", err)
-		h.logger.Error().Err(err)
-		return nil, status.Error(codes.Aborted, "internal server error")
-	}
-
-	return &pb.UserResponse{
-		User: &pb.LoginedUser{
+		User: &pb.User{
 			Email:    u.Email,
 			Token:    token,
 			Username: u.Username,
@@ -124,7 +122,7 @@ func (h *Handler) CurrentUser(ctx context.Context, req *empty.Empty) (*pb.UserRe
 	}
 
 	return &pb.UserResponse{
-		User: &pb.LoginedUser{
+		User: &pb.User{
 			Email:    u.Email,
 			Token:    token,
 			Username: u.Username,

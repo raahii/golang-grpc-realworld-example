@@ -63,7 +63,7 @@ func TestCreateUser(t *testing.T) {
 		{
 			"create fooUser: success",
 			&pb.CreateUserRequest{
-				User: &pb.User{
+				User: &pb.CreateUserRequest_User{
 					Username: "foo",
 					Email:    "foo@example.com",
 					Password: "secret",
@@ -75,12 +75,10 @@ func TestCreateUser(t *testing.T) {
 		{
 			"create barUser: success",
 			&pb.CreateUserRequest{
-				User: &pb.User{
+				User: &pb.CreateUserRequest_User{
 					Username: "bar",
 					Email:    "bar@example.com",
 					Password: "secret",
-					Bio:      "I'm foo!",
-					Image:    "https://golang.org/lib/godoc/images/go-logo-blue.svg",
 				},
 			},
 			&barUser,
@@ -89,7 +87,7 @@ func TestCreateUser(t *testing.T) {
 		{
 			"create fooUser: no username",
 			&pb.CreateUserRequest{
-				User: &pb.User{
+				User: &pb.CreateUserRequest_User{
 					Username: "",
 					Email:    "foo@example.com",
 					Password: "secret",
@@ -101,7 +99,7 @@ func TestCreateUser(t *testing.T) {
 		{
 			"create fooUser: username already exists",
 			&pb.CreateUserRequest{
-				User: &pb.User{
+				User: &pb.CreateUserRequest_User{
 					Username: "foo",
 					Email:    "foo@example.com",
 					Password: "secret",
@@ -113,7 +111,7 @@ func TestCreateUser(t *testing.T) {
 		{
 			"create fooUser: no email",
 			&pb.CreateUserRequest{
-				User: &pb.User{
+				User: &pb.CreateUserRequest_User{
 					Username: "foo",
 					Email:    "",
 					Password: "secret",
@@ -125,7 +123,7 @@ func TestCreateUser(t *testing.T) {
 		{
 			"create fooUser: email already exists",
 			&pb.CreateUserRequest{
-				User: &pb.User{
+				User: &pb.CreateUserRequest_User{
 					Username: "hoge",
 					Email:    "foo@example.com",
 					Password: "secret",
@@ -150,12 +148,6 @@ func TestCreateUser(t *testing.T) {
 			}
 			if resp.User.Email != tt.expected.Email {
 				t.Errorf("%q worng Email, expected %q, got %q", tt.title, tt.expected.Email, resp.User.Email)
-			}
-			if resp.User.Bio != tt.expected.Bio {
-				t.Errorf("%q worng Bio, expected %q, got %q", tt.title, tt.expected.Bio, resp.User.Bio)
-			}
-			if resp.User.Image != tt.expected.Image {
-				t.Errorf("%q worng Image, expected %q, got %q", tt.title, tt.expected.Image, resp.User.Image)
 			}
 			if resp.User.Token == "" {
 				t.Errorf("token must not be empety")
@@ -191,7 +183,7 @@ func TestLoginUser(t *testing.T) {
 		{
 			"login to fooUser: success",
 			&pb.LoginUserRequest{
-				User: &pb.User{
+				User: &pb.LoginUserRequest_User{
 					Email:    "foo@example.com",
 					Password: "secret",
 				},
@@ -202,7 +194,7 @@ func TestLoginUser(t *testing.T) {
 		{
 			"login to fooUser: wrong email",
 			&pb.LoginUserRequest{
-				User: &pb.User{
+				User: &pb.LoginUserRequest_User{
 					Email:    "foooo@example.com",
 					Password: "secret",
 				},
@@ -213,7 +205,7 @@ func TestLoginUser(t *testing.T) {
 		{
 			"login to fooUser: wrong password",
 			&pb.LoginUserRequest{
-				User: &pb.User{
+				User: &pb.LoginUserRequest_User{
 					Email:    "foo@example.com",
 					Password: "secrets",
 				},

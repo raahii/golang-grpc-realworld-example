@@ -6,33 +6,17 @@ option go_package = ".;proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
-message User {
-  string username = 1;
-  string email = 2;
-  string password = 3;
-  string bio = 4;
-  string image = 5;
-}
-
-message LoginedUser {
-  string email = 1;
-  string token = 2;
-  string username = 3;
-  string bio = 4;
-  string image = 5;
-}
-
 service Users {
-  rpc CreateUser (CreateUserRequest) returns (UserResponse) {
+  rpc LoginUser (LoginUserRequest) returns (UserResponse) {
     option (google.api.http) = {
-      post: "/users"
+      post: "/users/login"
       body: "*"
     };
   }
 
-  rpc LoginUser (LoginUserRequest) returns (UserResponse) {
+  rpc CreateUser (CreateUserRequest) returns (UserResponse) {
     option (google.api.http) = {
-      post: "/users/login"
+      post: "/users"
       body: "*"
     };
   }
@@ -44,15 +28,32 @@ service Users {
   }
 }
 
-message CreateUserRequest {
-  User user = 1;
+message User {
+  string email = 1;
+  string token = 2;
+  string username = 3;
+  string bio = 4;
+  string image = 5;
 }
 
 message LoginUserRequest {
+  message User {
+    string email = 1;
+    string password = 2;
+  }
+  User user = 1;
+}
+
+message CreateUserRequest {
+  message User {
+    string username = 1;
+    string email = 2;
+    string password = 3;
+  }
   User user = 1;
 }
 
 message UserResponse {
-  LoginedUser user = 1;
+  User user = 1;
 }
 
