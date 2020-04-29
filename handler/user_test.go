@@ -294,7 +294,7 @@ func TestCurrentUser(t *testing.T) {
 			t.Error(err)
 		}
 
-		ctx := ctxWithToken(context.Background(), "bearer", token)
+		ctx := ctxWithToken(context.Background(), "Token", token)
 		resp, err := h.CurrentUser(ctx, &empty.Empty{})
 		if (err != nil) != tt.hasError {
 			t.Errorf("%q hasError %t, but got error: %v.", tt.title, tt.hasError, err)
