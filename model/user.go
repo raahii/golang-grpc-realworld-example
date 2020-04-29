@@ -19,6 +19,20 @@ type User struct {
 	Image    string
 }
 
+func (u *User) HashPassword() error {
+	if len(u.Password) == 0 {
+		return errors.New("password should not be empty")
+	}
+
+	h, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	u.Password = string(h)
+
+	return nil
+}
+
 func (u User) Validate() error {
 	return validation.ValidateStruct(&u,
 		validation.Field(
@@ -37,23 +51,4 @@ func (u User) Validate() error {
 			validation.Required,
 		),
 	)
-}
-
-func (u *User) HashPassword() error {
-	if len(u.Password) == 0 {
-		return errors.New("password should not be empty")
-	}
-
-	h, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
-	if err != nil {
-		return err
-	}
-	u.Password = string(h)
-
-	return nil
-}
-
-func (u *User) CheckPassword(plain string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(plain))
-	return err == nil
 }
