@@ -12,6 +12,26 @@
   ],
   "paths": {
     "/users": {
+      "get": {
+        "operationId": "CurrentUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/protoUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "Users"
+        ]
+      },
       "post": {
         "operationId": "CreateUser",
         "responses": {

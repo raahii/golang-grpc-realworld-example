@@ -4,6 +4,7 @@ package proto;
 option go_package = ".;proto";
 
 import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
 
 message User {
   string username = 1;
@@ -33,6 +34,12 @@ service Users {
     option (google.api.http) = {
       post: "/users/login"
       body: "*"
+    };
+  }
+
+  rpc CurrentUser (google.protobuf.Empty) returns (UserResponse) {
+    option (google.api.http) = {
+      get: "/users"
     };
   }
 }

@@ -7,14 +7,19 @@ import (
 	"os"
 	"testing"
 
+	"github.com/golang/protobuf/ptypes/empty"
+	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
+	"github.com/raahii/golang-grpc-realworld-example/auth"
 	"github.com/raahii/golang-grpc-realworld-example/db"
 	"github.com/raahii/golang-grpc-realworld-example/model"
 	pb "github.com/raahii/golang-grpc-realworld-example/proto"
 	"github.com/rs/zerolog"
+	"google.golang.org/grpc/metadata"
 )
 
 func setUp(t *testing.T) (*Handler, func(t *testing.T)) {
 	w := zerolog.ConsoleWriter{Out: ioutil.Discard}
+	// w := zerolog.ConsoleWriter{Out: os.Stderr}
 	l := zerolog.New(w).With().Timestamp().Logger()
 
 	d, err := db.NewTestDB()
@@ -135,6 +140,7 @@ func TestCreateUser(t *testing.T) {
 		resp, err := h.CreateUser(c, tt.req)
 		if (err != nil) != tt.hasError {
 			t.Errorf("%s hasError %t, but got error: %v.", tt.title, tt.hasError, err)
+			t.FailNow()
 		}
 
 		if !tt.hasError {
@@ -221,6 +227,77 @@ func TestLoginUser(t *testing.T) {
 		resp, err := h.LoginUser(c, tt.req)
 		if (err != nil) != tt.hasError {
 			t.Errorf("%q hasError %t, but got error: %v.", tt.title, tt.hasError, err)
+			t.FailNow()
+		}
+
+		if !tt.hasError {
+			if resp.User.Username != tt.expected.Username {
+				t.Errorf("%q worng Username, expected %q, got %q", tt.title, tt.expected.Username, resp.User.Username)
+			}
+			if resp.User.Email != tt.expected.Email {
+				t.Errorf("%q worng Email, expected %q, got %q", tt.title, tt.expected.Email, resp.User.Email)
+			}
+			if resp.User.Bio != tt.expected.Bio {
+				t.Errorf("%q worng Bio, expected %q, got %q", tt.title, tt.expected.Bio, resp.User.Bio)
+			}
+			if resp.User.Image != tt.expected.Image {
+				t.Errorf("%q worng Image, expected %q, got %q", tt.title, tt.expected.Image, resp.User.Image)
+			}
+			if resp.User.Token == "" {
+				t.Errorf("token must not be empety")
+			}
+		}
+	}
+}
+
+func ctxWithToken(ctx context.Context, scheme string, token string) context.Context {
+	md := metadata.Pairs("authorization", fmt.Sprintf("%s %v", scheme, token))
+	nCtx := metautils.NiceMD(md).ToIncoming(ctx)
+	return nCtx
+}
+
+func TestCurrentUser(t *testing.T) {
+	h, cleaner := setUp(t)
+	defer cleaner(t)
+
+	fooUser := model.User{
+		Username: "foo",
+		Email:    "foo@example.com",
+		Password: "secret",
+	}
+
+	err := fooUser.HashPassword()
+	if err != nil {
+		t.Fatal("failed to hash password")
+	}
+
+	if err := h.db.Create(&fooUser).Error; err != nil {
+		t.Fatalf("failed to create initial user record: %v", err)
+	}
+
+	tests := []struct {
+		title    string
+		expected *model.User
+		hasError bool
+	}{
+		{
+			"get fooUser",
+			&fooUser,
+			false,
+		},
+	}
+
+	for _, tt := range tests {
+		token, err := auth.GenerateToken(tt.expected.ID)
+		if err != nil {
+			t.Error(err)
+		}
+
+		ctx := ctxWithToken(context.Background(), "bearer", token)
+		resp, err := h.CurrentUser(ctx, &empty.Empty{})
+		if (err != nil) != tt.hasError {
+			t.Errorf("%q hasError %t, but got error: %v.", tt.title, tt.hasError, err)
+			t.FailNow()
 		}
 
 		if !tt.hasError {

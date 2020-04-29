@@ -25,6 +25,7 @@ func main() {
 		l.Panic().Err(fmt.Errorf("failed to connect database: %w", err))
 	}
 	db.AutoMigrate(d)
+	l.Info().Msg("success to connect to the database")
 
 	h := handler.New(&l, d)
 
@@ -36,7 +37,7 @@ func main() {
 	s := grpc.NewServer()
 	pb.RegisterGreeterServer(s, h)
 	pb.RegisterUsersServer(s, h)
-	pb.RegisterProfilesService(s, h)
+	pb.RegisterProfilesServer(s, h)
 	l.Info().Msgf("starting server on port %s\n", port)
 	if err := s.Serve(lis); err != nil {
 		l.Panic().Err(fmt.Errorf("failed to serve: %w", err))
