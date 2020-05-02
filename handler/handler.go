@@ -18,6 +18,6 @@ func New(l *zerolog.Logger, d *gorm.DB) *Handler {
 }
 
 func (h *Handler) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
-	h.logger.Info().Msgf("Received: %v", in.GetName())
+	h.logger.Info().Msgf("hello request: %v", in)
 	return &pb.HelloReply{Message: "Hello " + in.GetName()}, nil
 }
