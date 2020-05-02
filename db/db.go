@@ -36,7 +36,7 @@ func NewTestDB() (*gorm.DB, error) {
 }
 
 func DropTestDB() error {
-	if err := os.Remove("./db/data/realworld_test.db"); err != nil {
+	if err := os.Remove("../db/data/realworld_test.db"); err != nil {
 		return err
 	}
 	return nil
