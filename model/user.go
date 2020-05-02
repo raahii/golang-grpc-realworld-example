@@ -15,8 +15,8 @@ type User struct {
 	Username string `gorm:"unique_index;not null"`
 	Email    string `gorm:"unique_index;not null"`
 	Password string `gorm:"not null"`
-	Bio      string
-	Image    string
+	Bio      string `gorm:"not null"`
+	Image    string `gorm:"not null"`
 }
 
 func (u User) Validate() error {
@@ -33,8 +33,9 @@ func (u User) Validate() error {
 			is.Email,
 		),
 		validation.Field(
-			&u.Email,
+			&u.Password,
 			validation.Required,
+			validation.Length(6, 100),
 		),
 	)
 }

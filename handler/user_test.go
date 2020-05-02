@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
-	"os"
 	"testing"
 	"time"
 
@@ -15,6 +14,7 @@ import (
 	"github.com/raahii/golang-grpc-realworld-example/model"
 	pb "github.com/raahii/golang-grpc-realworld-example/proto"
 	"github.com/rs/zerolog"
+	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -30,7 +30,7 @@ func setUp(t *testing.T) (*Handler, func(t *testing.T)) {
 	db.AutoMigrate(d)
 
 	return New(&l, d), func(t *testing.T) {
-		err := os.Remove("../db/data/realworld_test.db")
+		err := db.DropTestDB()
 		if err != nil {
 			t.Fatal(fmt.Errorf("failed to clean database: %w", err))
 		}
@@ -294,7 +294,7 @@ func TestCurrentUser(t *testing.T) {
 			t.Error(err)
 		}
 
-		ctx := ctxWithToken(context.Background(), "bearer", token)
+		ctx := ctxWithToken(context.Background(), "Token", token)
 		resp, err := h.CurrentUser(ctx, &empty.Empty{})
 		if (err != nil) != tt.hasError {
 			t.Errorf("%q hasError %t, but got error: %v.", tt.title, tt.hasError, err)
@@ -317,6 +317,93 @@ func TestCurrentUser(t *testing.T) {
 			if resp.User.Token == "" {
 				t.Errorf("token must not be empety")
 			}
+		}
+	}
+}
+
+func TestUpdateUser(t *testing.T) {
+	h, cleaner := setUp(t)
+	defer cleaner(t)
+
+	fooUser := model.User{
+		Username: "foo",
+		Email:    "foo@example.com",
+		Password: "secret",
+	}
+
+	for _, u := range []*model.User{&fooUser} {
+		err := u.HashPassword()
+		if err != nil {
+			t.Fatal("failed to hash password")
+		}
+
+		if err := h.db.Create(u).Error; err != nil {
+			t.Fatalf("failed to create initial user record: %v", err)
+		}
+	}
+
+	tests := []struct {
+		title    string
+		user     *model.User
+		req      *pb.UpdateUserRequest
+		expected *model.User
+		hasError bool
+	}{
+		{
+			"update fooUser: ok",
+			&fooUser,
+			&pb.UpdateUserRequest{
+				User: &pb.UpdateUserRequest_User{
+					Username: "hoge",
+					Bio:      "Hello, World!",
+				},
+			},
+			&model.User{
+				Username: "hoge",
+				Email:    "foo@example.com",
+				Bio:      "Hello, World!",
+				Image:    "",
+			},
+			false,
+		},
+		{
+			"update fooUser: ignore zero-value field",
+			&fooUser,
+			&pb.UpdateUserRequest{
+				User: &pb.UpdateUserRequest_User{
+					Username: "foo",
+					Email:    "",
+				},
+			},
+			&model.User{
+				Username: "foo",
+				Email:    "foo@example.com",
+				Bio:      "Hello, World!",
+				Image:    "",
+			},
+			false,
+		},
+	}
+
+	for _, tt := range tests {
+		token, err := auth.GenerateToken(tt.user.ID)
+		if err != nil {
+			t.Error(err)
+		}
+
+		ctx := ctxWithToken(context.Background(), "Token", token)
+		resp, err := h.UpdateUser(ctx, tt.req)
+		if (err != nil) != tt.hasError {
+			t.Errorf("%q hasError %t, but got error: %v.", tt.title, tt.hasError, err)
+			t.FailNow()
+		}
+
+		if !tt.hasError {
+			assert.Equal(t, resp.User.Username, tt.expected.Username)
+			assert.Equal(t, resp.User.Email, tt.expected.Email)
+			assert.Equal(t, resp.User.Bio, tt.expected.Bio)
+			assert.Equal(t, resp.User.Image, tt.expected.Image)
+			assert.NotEmpty(t, resp.User.Token)
 		}
 	}
 }

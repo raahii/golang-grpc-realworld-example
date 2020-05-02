@@ -26,6 +26,12 @@ service Users {
       get: "/users"
     };
   }
+
+  rpc UpdateUser (UpdateUserRequest) returns (UserResponse) {
+    option (google.api.http) = {
+      get: "/users"
+    };
+  }
 }
 
 message User {
@@ -49,6 +55,17 @@ message CreateUserRequest {
     string username = 1;
     string email = 2;
     string password = 3;
+  }
+  User user = 1;
+}
+
+message UpdateUserRequest {
+  message User {
+    string email = 1;
+    string password = 2;
+    string username = 3;
+    string bio = 4;
+    string image = 5;
   }
   User user = 1;
 }

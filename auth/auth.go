@@ -44,7 +44,7 @@ func generateToken(id uint, now time.Time) (string, error) {
 }
 
 func GetUserID(ctx context.Context) (uint, error) {
-	tokenString, err := grpc_auth.AuthFromMD(ctx, "bearer")
+	tokenString, err := grpc_auth.AuthFromMD(ctx, "Token")
 	if err != nil {
 		return 0, err
 	}
