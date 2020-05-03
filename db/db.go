@@ -1,6 +1,7 @@
 package db
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -9,12 +10,16 @@ import (
 	"os"
 
 	"github.com/BurntSushi/toml"
+	"github.com/google/uuid"
 	"github.com/jinzhu/gorm"
 	"github.com/joho/godotenv"
 	"github.com/raahii/golang-grpc-realworld-example/model"
 
-	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"github.com/DATA-DOG/go-txdb"
+	_ "github.com/go-sql-driver/mysql"
 )
+
+var txdbRegisterd bool
 
 func dsn() (string, error) {
 	host := os.Getenv("DB_HOST")
@@ -75,16 +80,40 @@ func New() (*gorm.DB, error) {
 }
 
 func NewTestDB() (*gorm.DB, error) {
-	//TODO: replace test database
 	err := godotenv.Load("../env/local.env")
 	if err != nil {
 		return nil, err
 	}
-	return New()
+
+	s, err := dsn()
+	if err != nil {
+		return nil, err
+	}
+
+	if !txdbRegisterd {
+		txdb.Register("txdb", "mysql", s)
+		txdbRegisterd = true
+	}
+
+	sql, err := sql.Open("txdb", uuid.New().String())
+	if err != nil {
+		return nil, err
+	}
+
+	d, err := gorm.Open("mysql", sql)
+	if err != nil {
+		return nil, err
+	}
+
+	d.DB().SetMaxIdleConns(3)
+	d.LogMode(false)
+
+	return d, nil
 }
 
 func DropTestDB(d *gorm.DB) error {
-	return d.DropTableIfExists("users", "follows").Error
+	d.Close()
+	return nil
 }
 
 func AutoMigrate(db *gorm.DB) error {
