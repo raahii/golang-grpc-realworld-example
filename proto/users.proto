@@ -1,5 +1,6 @@
 syntax = "proto3";
-package proto;
+
+package profile;
 
 option go_package = ".;proto";
 
@@ -73,4 +74,3 @@ message UpdateUserRequest {
 message UserResponse {
   User user = 1;
 }
-

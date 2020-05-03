@@ -7,8 +7,12 @@ services:
       dockerfile: Dockerfile
     ports:
       - "50051:50051"
+    env_file:
+      - "env/docker.env"
     volumes:
-      - ".:/go/app:delegated"
+      - ".:/go/app"
+    links:
+      - db
 
   gateway:
     build:
@@ -19,4 +23,13 @@ services:
     links:
       - app
     volumes:
-      - ".:/go/app:delegated"
+      - ".:/go/app"
+
+  db:
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: app
+    ports:
+      - "3306:3306"

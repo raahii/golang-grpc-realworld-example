@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "profiles.proto",
+    "title": "hello.proto",
     "version": "version not set"
   },
   "consumes": [
@@ -11,14 +11,14 @@
     "application/json"
   ],
   "paths": {
-    "/profiles/{username}": {
+    "/hello": {
       "get": {
-        "operationId": "FollowUser",
+        "operationId": "SayHello",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/profileProfileResponse"
+              "$ref": "#/definitions/helloHelloReply"
             }
           },
           "default": {
@@ -28,44 +28,18 @@
             }
           }
         },
-        "parameters": [
-          {
-            "name": "username",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
         "tags": [
-          "Profiles"
+          "Greeter"
         ]
       }
     }
   },
   "definitions": {
-    "profileProfile": {
+    "helloHelloReply": {
       "type": "object",
       "properties": {
-        "username": {
+        "message": {
           "type": "string"
-        },
-        "bio": {
-          "type": "string"
-        },
-        "image": {
-          "type": "string"
-        },
-        "following": {
-          "type": "boolean",
-          "format": "boolean"
-        }
-      }
-    },
-    "profileProfileResponse": {
-      "type": "object",
-      "properties": {
-        "profile": {
-          "$ref": "#/definitions/profileProfile"
         }
       }
     },

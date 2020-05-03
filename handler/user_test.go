@@ -2,40 +2,15 @@ package handler
 
 import (
 	"context"
-	"fmt"
-	"io/ioutil"
 	"testing"
 	"time"
 
 	"github.com/golang/protobuf/ptypes/empty"
-	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
 	"github.com/raahii/golang-grpc-realworld-example/auth"
-	"github.com/raahii/golang-grpc-realworld-example/db"
 	"github.com/raahii/golang-grpc-realworld-example/model"
 	pb "github.com/raahii/golang-grpc-realworld-example/proto"
-	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
-	"google.golang.org/grpc/metadata"
 )
-
-func setUp(t *testing.T) (*Handler, func(t *testing.T)) {
-	w := zerolog.ConsoleWriter{Out: ioutil.Discard}
-	// w := zerolog.ConsoleWriter{Out: os.Stderr}
-	l := zerolog.New(w).With().Timestamp().Logger()
-
-	d, err := db.NewTestDB()
-	if err != nil {
-		t.Fatal(fmt.Errorf("failed to initialize database: %w", err))
-	}
-	db.AutoMigrate(d)
-
-	return New(&l, d), func(t *testing.T) {
-		err := db.DropTestDB()
-		if err != nil {
-			t.Fatal(fmt.Errorf("failed to clean database: %w", err))
-		}
-	}
-}
 
 func TestCreateUser(t *testing.T) {
 	h, cleaner := setUp(t)
@@ -243,12 +218,6 @@ func TestLoginUser(t *testing.T) {
 	}
 }
 
-func ctxWithToken(ctx context.Context, scheme string, token string) context.Context {
-	md := metadata.Pairs("authorization", fmt.Sprintf("%s %v", scheme, token))
-	nCtx := metautils.NiceMD(md).ToIncoming(ctx)
-	return nCtx
-}
-
 func TestCurrentUser(t *testing.T) {
 	h, cleaner := setUp(t)
 	defer cleaner(t)
@@ -294,7 +263,7 @@ func TestCurrentUser(t *testing.T) {
 			t.Error(err)
 		}
 
-		ctx := ctxWithToken(context.Background(), "Token", token)
+		ctx := ctxWithToken(context.Background(), token)
 		resp, err := h.CurrentUser(ctx, &empty.Empty{})
 		if (err != nil) != tt.hasError {
 			t.Errorf("%q hasError %t, but got error: %v.", tt.title, tt.hasError, err)
@@ -391,7 +360,7 @@ func TestUpdateUser(t *testing.T) {
 			t.Error(err)
 		}
 
-		ctx := ctxWithToken(context.Background(), "Token", token)
+		ctx := ctxWithToken(context.Background(), token)
 		resp, err := h.UpdateUser(ctx, tt.req)
 		if (err != nil) != tt.hasError {
 			t.Errorf("%q hasError %t, but got error: %v.", tt.title, tt.hasError, err)

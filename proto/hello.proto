@@ -1,20 +1,19 @@
 syntax = "proto3";
-package proto;
+
+package hello;
 
 option go_package = ".;proto";
 
 import "google/api/annotations.proto";
+import "empty.proto";
+
 
 service Greeter {
-  rpc SayHello (HelloRequest) returns (HelloReply) {
+  rpc SayHello (empty.Empty) returns (HelloReply) {
     option (google.api.http) = {
       get: "/hello"
     };
   }
-}
-
-message HelloRequest {
-  string name = 1;
 }
 
 message HelloReply {

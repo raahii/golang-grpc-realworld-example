@@ -18,7 +18,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protoUserResponse"
+              "$ref": "#/definitions/profileUserResponse"
             }
           },
           "default": {
@@ -70,7 +70,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protoUserResponse"
+              "$ref": "#/definitions/profileUserResponse"
             }
           },
           "default": {
@@ -86,7 +86,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/protoCreateUserRequest"
+              "$ref": "#/definitions/profileCreateUserRequest"
             }
           }
         ],
@@ -102,7 +102,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/protoUserResponse"
+              "$ref": "#/definitions/profileUserResponse"
             }
           },
           "default": {
@@ -118,7 +118,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/protoLoginUserRequest"
+              "$ref": "#/definitions/profileLoginUserRequest"
             }
           }
         ],
@@ -129,15 +129,15 @@
     }
   },
   "definitions": {
-    "protoCreateUserRequest": {
+    "profileCreateUserRequest": {
       "type": "object",
       "properties": {
         "user": {
-          "$ref": "#/definitions/protoCreateUserRequestUser"
+          "$ref": "#/definitions/profileCreateUserRequestUser"
         }
       }
     },
-    "protoCreateUserRequestUser": {
+    "profileCreateUserRequestUser": {
       "type": "object",
       "properties": {
         "username": {
@@ -151,15 +151,15 @@
         }
       }
     },
-    "protoLoginUserRequest": {
+    "profileLoginUserRequest": {
       "type": "object",
       "properties": {
         "user": {
-          "$ref": "#/definitions/protoLoginUserRequestUser"
+          "$ref": "#/definitions/profileLoginUserRequestUser"
         }
       }
     },
-    "protoLoginUserRequestUser": {
+    "profileLoginUserRequestUser": {
       "type": "object",
       "properties": {
         "email": {
@@ -170,7 +170,7 @@
         }
       }
     },
-    "protoUpdateUserRequestUser": {
+    "profileUpdateUserRequestUser": {
       "type": "object",
       "properties": {
         "email": {
@@ -190,7 +190,7 @@
         }
       }
     },
-    "protoUser": {
+    "profileUser": {
       "type": "object",
       "properties": {
         "email": {
@@ -210,11 +210,11 @@
         }
       }
     },
-    "protoUserResponse": {
+    "profileUserResponse": {
       "type": "object",
       "properties": {
         "user": {
-          "$ref": "#/definitions/protoUser"
+          "$ref": "#/definitions/profileUser"
         }
       }
     },
