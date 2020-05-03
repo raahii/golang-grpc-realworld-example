@@ -1,5 +1,6 @@
 syntax = "proto3";
-package proto;
+
+package profile;
 
 option go_package = ".;proto";
 
@@ -10,11 +11,16 @@ message Profile {
   string username = 1;
   string bio = 2;
   string image = 3;
-  // repeated User followers = 4;
+  bool following = 4;
 }
 
 service Profiles {
   rpc ShowProfile (ShowProfileRequest) returns (ProfileResponse) {
+    option (google.api.http) = {
+      get: "/profiles/{username}"
+    };
+  }
+  rpc FollowUser (FollowRequest) returns (ProfileResponse) {
     option (google.api.http) = {
       get: "/profiles/{username}"
     };
@@ -25,6 +31,9 @@ message ShowProfileRequest {
   string username = 1;
 }
 
+message FollowRequest {
+  string username = 1;
+}
 
 message ProfileResponse {
   Profile profile = 1;
