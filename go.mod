@@ -14,6 +14,9 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.2.0
 	github.com/grpc-ecosystem/grpc-gateway v1.14.4
 	github.com/jinzhu/gorm v1.9.12
+	github.com/joho/godotenv v1.3.0
+	github.com/k0kubun/pp v3.0.1+incompatible
+	github.com/mattn/go-colorable v0.1.6 // indirect
 	github.com/rs/zerolog v1.18.0
 	github.com/stretchr/testify v1.5.1
 	golang.org/x/crypto v0.0.0-20191205180655-e7c4368fe9dd

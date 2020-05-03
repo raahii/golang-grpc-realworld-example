@@ -263,7 +263,7 @@ func TestCurrentUser(t *testing.T) {
 			t.Error(err)
 		}
 
-		ctx := ctxWithToken(context.Background(), "Token", token)
+		ctx := ctxWithToken(context.Background(), token)
 		resp, err := h.CurrentUser(ctx, &empty.Empty{})
 		if (err != nil) != tt.hasError {
 			t.Errorf("%q hasError %t, but got error: %v.", tt.title, tt.hasError, err)
@@ -360,7 +360,7 @@ func TestUpdateUser(t *testing.T) {
 			t.Error(err)
 		}
 
-		ctx := ctxWithToken(context.Background(), "Token", token)
+		ctx := ctxWithToken(context.Background(), token)
 		resp, err := h.UpdateUser(ctx, tt.req)
 		if (err != nil) != tt.hasError {
 			t.Errorf("%q hasError %t, but got error: %v.", tt.title, tt.hasError, err)

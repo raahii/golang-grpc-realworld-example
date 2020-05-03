@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
-	"os"
 	"testing"
 
 	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
@@ -25,14 +24,15 @@ func setUp(t *testing.T) (*Handler, func(t *testing.T)) {
 	db.AutoMigrate(d)
 
 	return New(&l, d), func(t *testing.T) {
-		err := os.Remove("../db/data/realworld_test.db")
+		err := db.DropTestDB(d)
 		if err != nil {
 			t.Fatal(fmt.Errorf("failed to clean database: %w", err))
 		}
 	}
 }
 
-func ctxWithToken(ctx context.Context, scheme string, token string) context.Context {
+func ctxWithToken(ctx context.Context, token string) context.Context {
+	scheme := "Token"
 	md := metadata.Pairs("authorization", fmt.Sprintf("%s %v", scheme, token))
 	nCtx := metautils.NiceMD(md).ToIncoming(ctx)
 	return nCtx

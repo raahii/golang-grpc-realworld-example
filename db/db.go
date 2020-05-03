@@ -10,6 +10,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/jinzhu/gorm"
+	"github.com/joho/godotenv"
 	"github.com/raahii/golang-grpc-realworld-example/model"
 
 	_ "github.com/jinzhu/gorm/dialects/mysql"
@@ -74,22 +75,16 @@ func New() (*gorm.DB, error) {
 }
 
 func NewTestDB() (*gorm.DB, error) {
-	d, err := gorm.Open("sqlite3", "../db/data/realworld_test.db")
+	//TODO: replace test database
+	err := godotenv.Load("../env/local.env")
 	if err != nil {
 		return nil, err
 	}
-
-	d.DB().SetMaxIdleConns(3)
-	d.LogMode(false)
-
-	return d, nil
+	return New()
 }
 
-func DropTestDB() error {
-	if err := os.Remove("../db/data/realworld_test.db"); err != nil {
-		return err
-	}
-	return nil
+func DropTestDB(d *gorm.DB) error {
+	return d.DropTableIfExists("users", "follows").Error
 }
 
 func AutoMigrate(db *gorm.DB) error {
