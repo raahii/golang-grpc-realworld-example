@@ -98,3 +98,62 @@ func (h *Handler) FollowUser(ctx context.Context, req *pb.FollowRequest) (*pb.Pr
 
 	return &pb.ProfileResponse{Profile: &p}, nil
 }
+
+// follow user
+func (h *Handler) UnfollowUser(ctx context.Context, req *pb.UnfollowRequest) (*pb.ProfileResponse, error) {
+	h.logger.Info().Msgf("Unfollow User | req: %+v\n", req)
+
+	userID, err := auth.GetUserID(ctx)
+	if err != nil {
+		err = fmt.Errorf("unauthenticated: %w", err)
+		h.logger.Error().Err(err).Msg("unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
+	}
+
+	var currentUser model.User
+	err = h.db.Find(&currentUser, userID).Error
+	if err != nil {
+		h.logger.Fatal().Err(err).Msg("current user not found")
+		return nil, status.Error(codes.NotFound, "user not found")
+	}
+
+	if currentUser.Username == req.Username {
+		h.logger.Error().Msg("cannot unfollow yourself")
+		return nil, status.Error(codes.InvalidArgument, "cannot follow yourself")
+	}
+
+	var u model.User
+	err = h.db.Where("username = ?", req.Username).First(&u).Error
+	if err != nil {
+		h.logger.Fatal().Err(err).Msg("target user not found")
+		return nil, status.Error(codes.NotFound, "user was not found")
+	}
+
+	var count int
+	err = h.db.Table("follows").Where("from_user_id = ? AND to_user_id = ?", currentUser.ID, u.ID).Count(&count).Error
+	if err != nil {
+		h.logger.Fatal().Err(err).Msg("failed to find following relationship")
+		return nil, status.Error(codes.Aborted, "internal server error")
+	}
+	following := count >= 1
+
+	if !following {
+		h.logger.Error().Err(err).Msg("requested user is not following")
+		return nil, status.Errorf(codes.Unauthenticated, "requested user is not following")
+	}
+
+	err = h.db.Model(&currentUser).Association("Follows").Delete(&u).Error
+	if err != nil {
+		h.logger.Fatal().Err(err).Msgf("failed to unfollow user: (ID: %d) -> (ID: %d)", currentUser.ID, u.ID)
+		return nil, status.Error(codes.Aborted, "failed to unfollow user")
+	}
+
+	p := pb.Profile{
+		Username:  u.Username,
+		Bio:       u.Bio,
+		Image:     u.Image,
+		Following: false,
+	}
+
+	return &pb.ProfileResponse{Profile: &p}, nil
+}
