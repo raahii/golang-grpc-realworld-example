@@ -22,7 +22,12 @@ service Profiles {
   }
   rpc FollowUser (FollowRequest) returns (ProfileResponse) {
     option (google.api.http) = {
-      get: "/profiles/{username}"
+      post: "/profiles/{username}"
+    };
+  }
+  rpc UnfollowUser (UnfollowRequest) returns (ProfileResponse) {
+    option (google.api.http) = {
+      delete: "/profiles/{username}"
     };
   }
 }
@@ -32,6 +37,10 @@ message ShowProfileRequest {
 }
 
 message FollowRequest {
+  string username = 1;
+}
+
+message UnfollowRequest {
   string username = 1;
 }
 

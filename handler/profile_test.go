@@ -161,3 +161,88 @@ func TestFollowUser(t *testing.T) {
 		assert.Equal(t, resp.GetProfile().GetFollowing(), tt.expected.GetFollowing())
 	}
 }
+
+func TestUnfollowUser(t *testing.T) {
+	h, cleaner := setUp(t)
+	defer cleaner(t)
+
+	fooUser := model.User{
+		Username: "foo",
+		Email:    "foo@example.com",
+		Password: "secret",
+	}
+
+	barUser := model.User{
+		Username: "bar",
+		Email:    "bar@example.com",
+		Password: "secret",
+	}
+
+	for _, u := range []*model.User{&fooUser, &barUser} {
+		if err := h.db.Create(u).Error; err != nil {
+			t.Fatalf("failed to create initial user record: %v", err)
+		}
+	}
+
+	err := h.db.Model(&fooUser).Association("Follows").Append(&barUser).Error
+	if err != nil {
+		t.Fatalf("failed to create initial following relationship: %v", err)
+	}
+
+	tests := []struct {
+		title    string
+		req      *pb.UnfollowRequest
+		expected *pb.Profile
+		hasError bool
+	}{
+		{
+			"fooUser follows barUser: success",
+			&pb.UnfollowRequest{
+				Username: barUser.Username,
+			},
+			&pb.Profile{
+				Username:  barUser.Username,
+				Bio:       barUser.Bio,
+				Image:     barUser.Image,
+				Following: false,
+			},
+			false,
+		},
+		// {
+		// 	"fooUser follows fooUser: cannnot unfollow myself",
+		// 	&pb.UnfollowRequest{
+		// 		Username: fooUser.Username,
+		// 	},
+		// 	nil,
+		// 	true,
+		// },
+	}
+
+	token, err := auth.GenerateToken(fooUser.ID)
+	if err != nil {
+		t.Error(err)
+	}
+
+	for _, tt := range tests {
+		ctx := ctxWithToken(context.Background(), token)
+
+		resp, err := h.UnfollowUser(ctx, tt.req)
+		if tt.hasError {
+			if err == nil {
+				t.Errorf("%q expected to fail, but succeeded.", tt.title)
+				t.FailNow()
+			}
+			continue
+		}
+
+		if !tt.hasError && err != nil {
+			t.Errorf("%q expected to succeed, but failed. %v", tt.title, err)
+			t.FailNow()
+		}
+
+		assert.Equal(t, resp.GetProfile().GetUsername(), tt.expected.GetUsername())
+		assert.Equal(t, resp.GetProfile().GetBio(), tt.expected.GetBio())
+		assert.Equal(t, resp.GetProfile().GetImage(), tt.expected.GetImage())
+		assert.Equal(t, resp.GetProfile().GetFollowing(), tt.expected.GetFollowing())
+	}
+}
