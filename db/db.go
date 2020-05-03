@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"sync"
 	"time"
 
 	"os"
@@ -19,7 +20,8 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-var txdbRegisterd bool
+var txdbInitialized bool
+var mutex sync.Mutex
 
 func dsn() (string, error) {
 	host := os.Getenv("DB_HOST")
@@ -90,9 +92,9 @@ func NewTestDB() (*gorm.DB, error) {
 		return nil, err
 	}
 
-	if !txdbRegisterd {
+	mutex.Lock()
+	if !txdbInitialized {
 		txdb.Register("txdb", "mysql", s)
-		txdbRegisterd = true
 	}
 
 	sql, err := sql.Open("txdb", uuid.New().String())
@@ -105,8 +107,15 @@ func NewTestDB() (*gorm.DB, error) {
 		return nil, err
 	}
 
+	if !txdbInitialized {
+		AutoMigrate(d)
+		txdbInitialized = true
+	}
+
 	d.DB().SetMaxIdleConns(3)
 	d.LogMode(false)
+
+	mutex.Unlock()
 
 	return d, nil
 }
