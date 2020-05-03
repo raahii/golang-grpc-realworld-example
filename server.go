@@ -22,10 +22,17 @@ func main() {
 
 	d, err := db.New()
 	if err != nil {
-		l.Panic().Err(fmt.Errorf("failed to connect database: %w", err)).Msg("database error")
+		err = fmt.Errorf("failed to connect database: %w", err)
+		l.Fatal().Err(err).Msg("failed to connect the database")
+		os.Exit(1)
 	}
-	db.AutoMigrate(d)
 	l.Info().Msg("success to connect to the database")
+
+	err = db.AutoMigrate(d)
+	if err != nil {
+		l.Fatal().Err(err).Msg("failed to migrate database")
+		os.Exit(1)
+	}
 
 	h := handler.New(&l, d)
 
