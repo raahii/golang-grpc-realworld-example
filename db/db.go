@@ -94,28 +94,29 @@ func NewTestDB() (*gorm.DB, error) {
 
 	mutex.Lock()
 	if !txdbInitialized {
+		_d, err := gorm.Open("mysql", s)
+		if err != nil {
+			return nil, err
+		}
+		AutoMigrate(_d)
+
 		txdb.Register("txdb", "mysql", s)
-	}
-
-	sql, err := sql.Open("txdb", uuid.New().String())
-	if err != nil {
-		return nil, err
-	}
-
-	d, err := gorm.Open("mysql", sql)
-	if err != nil {
-		return nil, err
-	}
-
-	if !txdbInitialized {
-		AutoMigrate(d)
 		txdbInitialized = true
+	}
+	mutex.Unlock()
+
+	c, err := sql.Open("txdb", uuid.New().String())
+	if err != nil {
+		return nil, err
+	}
+
+	d, err := gorm.Open("mysql", c)
+	if err != nil {
+		return nil, err
 	}
 
 	d.DB().SetMaxIdleConns(3)
 	d.LogMode(false)
-
-	mutex.Unlock()
 
 	return d, nil
 }

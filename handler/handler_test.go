@@ -21,7 +21,6 @@ func setUp(t *testing.T) (*Handler, func(t *testing.T)) {
 	if err != nil {
 		t.Fatal(fmt.Errorf("failed to initialize database: %w", err))
 	}
-	db.AutoMigrate(d)
 
 	return New(&l, d), func(t *testing.T) {
 		err := db.DropTestDB(d)
