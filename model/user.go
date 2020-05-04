@@ -10,6 +10,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// User is user model
 type User struct {
 	gorm.Model
 	Username string `gorm:"unique_index;not null"`
@@ -20,6 +21,7 @@ type User struct {
 	Follows  []User `gorm:"many2many:follows;jointable_foreignkey:from_user_id;association_jointable_foreignkey:to_user_id"`
 }
 
+// Validate validates fields of user model
 func (u User) Validate() error {
 	return validation.ValidateStruct(&u,
 		validation.Field(
@@ -41,6 +43,7 @@ func (u User) Validate() error {
 	)
 }
 
+// HashPassword makes password field crypted
 func (u *User) HashPassword() error {
 	if len(u.Password) == 0 {
 		return errors.New("password should not be empty")
@@ -55,6 +58,7 @@ func (u *User) HashPassword() error {
 	return nil
 }
 
+// CheckPassword checki user password correct
 func (u *User) CheckPassword(plain string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(plain))
 	return err == nil

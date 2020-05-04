@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"testing"
 
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
 	"github.com/raahii/golang-grpc-realworld-example/db"
 	"github.com/rs/zerolog"

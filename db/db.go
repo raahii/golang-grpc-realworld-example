@@ -17,7 +17,6 @@ import (
 	"github.com/raahii/golang-grpc-realworld-example/model"
 
 	"github.com/DATA-DOG/go-txdb"
-	_ "github.com/go-sql-driver/mysql"
 )
 
 var txdbInitialized bool
@@ -56,6 +55,7 @@ func dsn() (string, error) {
 		user, password, host, port, name, options), nil
 }
 
+// New return mysql connection
 func New() (*gorm.DB, error) {
 	s, err := dsn()
 	if err != nil {
@@ -81,6 +81,7 @@ func New() (*gorm.DB, error) {
 	return d, nil
 }
 
+// NewTestDB return mysql connection wrapped txdb
 func NewTestDB() (*gorm.DB, error) {
 	err := godotenv.Load("../env/local.env")
 	if err != nil {
@@ -121,11 +122,13 @@ func NewTestDB() (*gorm.DB, error) {
 	return d, nil
 }
 
+// DropTestDB close connection
 func DropTestDB(d *gorm.DB) error {
 	d.Close()
 	return nil
 }
 
+// AutoMigrate is a wrapper of (*gorm.DB).AutoMigrate
 func AutoMigrate(db *gorm.DB) error {
 	err := db.AutoMigrate(
 		&model.User{},
@@ -136,6 +139,7 @@ func AutoMigrate(db *gorm.DB) error {
 	return nil
 }
 
+// Seed create initial data to the database
 func Seed(db *gorm.DB) error {
 	users := struct {
 		Users []model.User

@@ -13,7 +13,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// login user
+// LoginUser is existing user login
 func (h *Handler) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (*pb.UserResponse, error) {
 	h.logger.Info().Msg("login user")
 
@@ -50,7 +50,7 @@ func (h *Handler) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (*pb.
 	}, nil
 }
 
-// create new user
+// CreateUser registers a new user
 func (h *Handler) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.UserResponse, error) {
 	h.logger.Info().Msg("craete user")
 
@@ -103,7 +103,7 @@ func (h *Handler) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*p
 	}, nil
 }
 
-// get current user
+// CurrentUser gets a current user
 func (h *Handler) CurrentUser(ctx context.Context, req *empty.Empty) (*pb.UserResponse, error) {
 	h.logger.Info().Msg("get current user")
 
@@ -142,7 +142,7 @@ func (h *Handler) CurrentUser(ctx context.Context, req *empty.Empty) (*pb.UserRe
 	}, nil
 }
 
-// update user
+// UpdateUser updates current user
 func (h *Handler) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*pb.UserResponse, error) {
 	h.logger.Info().Msg("update user request")
 
