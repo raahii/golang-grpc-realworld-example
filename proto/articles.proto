@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package profile;
+
+option go_package = ".;proto";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+import "profiles.proto";
+
+message Article {
+  string slug = 1;
+  string title = 2;
+  string description = 3;
+  string body = 4;
+  repeated string tagList = 5;
+  google.protobuf.Timestamp createdAt = 6;
+  google.protobuf.Timestamp updatedAt = 7;
+  bool favorited = 8;
+  int64 favoriteCount = 9;
+  profile.Profile author = 10;
+}
+
+
+service Articles {
+  rpc CreateArticle (CreateAritcleRequest) returns (Article) {
+    option (google.api.http) = {
+      post: "/articles"
+    };
+  }
+}
+
+message CreateAritcleRequest {
+  message Article {
+    string title = 2;
+    string description = 3;
+    string body = 4;
+    repeated string tagList = 5;
+  }
+
+  Article article = 1;
+}
+
+message ArticleResponse {
+  Article article = 1;
+}

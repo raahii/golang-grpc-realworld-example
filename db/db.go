@@ -132,6 +132,8 @@ func DropTestDB(d *gorm.DB) error {
 func AutoMigrate(db *gorm.DB) error {
 	err := db.AutoMigrate(
 		&model.User{},
+		&model.Article{},
+		&model.Tag{},
 	).Error
 	if err != nil {
 		return err
