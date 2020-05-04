@@ -23,14 +23,19 @@ message Article {
 
 
 service Articles {
-  rpc CreateArticle (CreateAritcleRequest) returns (Article) {
+  rpc CreateArticle (CreateAritcleRequest) returns (ArticleResponse) {
     option (google.api.http) = {
       post: "/articles"
     };
   }
-  rpc GetArticle (GetArticleRequest) returns (Article) {
+  rpc GetArticle (GetArticleRequest) returns (ArticleResponse) {
     option (google.api.http) = {
       get: "/articles/{slug}"
+    };
+  }
+  rpc GetArticles (GetArticlesRequest) returns (ArticlesResponse) {
+    option (google.api.http) = {
+      get: "/articles"
     };
   }
 }
@@ -50,6 +55,18 @@ message GetArticleRequest {
   string slug = 1;
 }
 
+message GetArticlesRequest {
+  string tag = 1;
+  string author = 2;
+  string favorited = 3;
+  int64 limit = 4;
+  int64 offset = 5;
+}
+
 message ArticleResponse {
   Article article = 1;
+}
+
+message ArticlesResponse {
+  repeated Article articles = 1;
 }

@@ -12,13 +12,67 @@
   ],
   "paths": {
     "/articles": {
+      "get": {
+        "operationId": "GetArticles",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/profileArticlesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tag",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "author",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "favorited",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "Articles"
+        ]
+      },
       "post": {
         "operationId": "CreateArticle",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/profileArticle"
+              "$ref": "#/definitions/profileArticleResponse"
             }
           },
           "default": {
@@ -40,7 +94,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/profileArticle"
+              "$ref": "#/definitions/profileArticleResponse"
             }
           },
           "default": {
@@ -104,6 +158,25 @@
         },
         "author": {
           "$ref": "#/definitions/profileProfile"
+        }
+      }
+    },
+    "profileArticleResponse": {
+      "type": "object",
+      "properties": {
+        "article": {
+          "$ref": "#/definitions/profileArticle"
+        }
+      }
+    },
+    "profileArticlesResponse": {
+      "type": "object",
+      "properties": {
+        "articles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/profileArticle"
+          }
         }
       }
     },

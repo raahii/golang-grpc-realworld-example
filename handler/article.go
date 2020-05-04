@@ -143,3 +143,8 @@ func (h *Handler) GetArticle(ctx context.Context, req *pb.GetArticleRequest) (*p
 
 	return &pb.ArticleResponse{Article: &pa}, nil
 }
+
+// GetArticles gets recent articles globally
+func (h *Handler) GetArticles(ctx context.Context, req *pb.GetArticlesRequest) (*pb.ArticlesResponse, error) {
+	return &pb.ArticlesResponse{}, nil
+}

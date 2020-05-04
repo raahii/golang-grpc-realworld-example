@@ -46,6 +46,7 @@ func main() {
 	pb.RegisterGreeterServer(s, h)
 	pb.RegisterUsersServer(s, h)
 	pb.RegisterProfilesServer(s, h)
+	pb.RegisterArticlesServer(s, h)
 	l.Info().Msgf("starting server on port %s\n", port)
 	if err := s.Serve(lis); err != nil {
 		l.Panic().Err(fmt.Errorf("failed to serve: %w", err))

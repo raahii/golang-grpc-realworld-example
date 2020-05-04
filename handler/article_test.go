@@ -211,3 +211,101 @@ func TestGetArticle(t *testing.T) {
 		assert.Equal(t, tt.following, author.GetFollowing())
 	}
 }
+
+func TestGetArticles(t *testing.T) {
+	h, cleaner := setUp(t)
+	defer cleaner(t)
+
+	fooUser := model.User{
+		Username: "foo",
+		Email:    "foo@example.com",
+		Password: "secret",
+	}
+
+	barUser := model.User{
+		Username: "bar",
+		Email:    "bar@example.com",
+		Password: "secret",
+	}
+
+	for _, u := range []*model.User{&fooUser, &barUser} {
+		if err := h.db.Create(u).Error; err != nil {
+			t.Fatalf("failed to create initial user record: %v", err)
+		}
+	}
+
+	tag := model.Tag{Name: "hoge"}
+	if err := h.db.Create(&tag).Error; err != nil {
+		t.Fatalf("failed to create initial tag record: %v", err)
+	}
+
+	articles := make([]*model.Article, 10)
+	for i := 0; i < 10; i++ {
+		a := model.Article{
+			Title:       string(i),
+			Description: string(i),
+			Body:        string(i),
+			Tags:        []model.Tag{tag},
+		}
+		if i >= 5 {
+			a.Author = fooUser
+		} else {
+			a.Author = barUser
+		}
+
+		articles[10-i-1] = &a
+	}
+
+	for _, a := range articles {
+		if err := h.db.Create(a).Error; err != nil {
+			t.Fatalf("failed to create initial article record: %v", err)
+		}
+	}
+
+	tests := []struct {
+		title    string
+		req      *pb.GetArticlesRequest
+		expected []*model.Article
+		hasError bool
+	}{
+		{
+			"get articles with default queries",
+			&pb.GetArticlesRequest{
+				Tag:       "",
+				Author:    "",
+				Favorited: "",
+				Limit:     20,
+				Offset:    0,
+			},
+			articles,
+			false,
+		},
+	}
+
+	for _, tt := range tests {
+		ctx := context.Background()
+		resp, err := h.GetArticles(ctx, tt.req)
+		if tt.hasError {
+			if err == nil {
+				t.Errorf("%q expected to fail, but succeeded.", tt.title)
+				t.FailNow()
+			}
+			continue
+		}
+
+		if !tt.hasError && err != nil {
+			t.Errorf("%q expected to succeed, but failed. %v", tt.title, err)
+			t.FailNow()
+		}
+
+		assert.Len(t, resp.GetArticles(), len(tt.expected))
+
+		for i := 0; i < len(tt.expected); i++ {
+			got := resp.GetArticles()[i]
+			expected := tt.expected[i]
+
+			assert.Equal(t, got.Title, expected.Title)
+			assert.Equal(t, got.Author.Username, expected.Author.Username)
+		}
+	}
+}
