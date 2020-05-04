@@ -18,7 +18,7 @@ type User struct {
 	Password string `gorm:"not null"`
 	Bio      string `gorm:"not null"`
 	Image    string `gorm:"not null"`
-	Follows  []User `gorm:"many2many:follows;jointable_foreignkey:from_user_id;association_jointable_foreignkey:to_user_id"`
+	Follows  []User `gorm:"many2many:follows;jointable_foreignkey:from_user_id;association_jointable_foreignkey:to_user_id;"`
 }
 
 // Validate validates fields of user model

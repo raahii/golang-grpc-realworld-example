@@ -111,12 +111,22 @@ func TestGetArticle(t *testing.T) {
 		}
 	}
 
+	err := h.db.Model(&barUser).Association("Follows").Append(&fooUser).Error
+	if err != nil {
+		t.Fatalf("failed to create initial user relationship: %v", err)
+	}
+
+	tag := model.Tag{Name: "hoge"}
+	if err := h.db.Create(&tag).Error; err != nil {
+		t.Fatalf("failed to create initial tag record: %v", err)
+	}
+
 	awesomeArticle := model.Article{
 		Title:       "awesome post!",
 		Description: "awesome description!",
 		Body:        "awesome content!",
-		Tags:        []model.Tag{model.Tag{Name: "hoge"}},
-		UserID:      fooUser.ID,
+		Tags:        []model.Tag{tag},
+		Author:      fooUser,
 	}
 
 	for _, a := range []*model.Article{&awesomeArticle} {
@@ -143,26 +153,16 @@ func TestGetArticle(t *testing.T) {
 			false,
 			false,
 		},
-		// {
-		// 	"get article from barUser: success",
-		// 	nil,
-		// 	&pb.GetArticleRequest{
-		// 		Slug: string(awesomeArticle.ID),
-		// 	},
-		// 	&pb.Article{
-		// 		Title:       awesomeArticle.Title,
-		// 		Description: awesomeArticle.Description,
-		// 		Body:        awesomeArticle.Body,
-		// 		TagList:     []string{awesomeArticle.Tags[0].Name},
-		// 		Favorited:   false,
-		// 		Author: &pb.Profile{
-		// 			Username:  fooUser.Username,
-		// 			Bio:       fooUser.Bio,
-		// 			Image:     fooUser.Image,
-		// 			Following: false,
-		// 		},
-		// 	},
-		// },
+		{
+			"get article from barUser: success",
+			&barUser,
+			&pb.GetArticleRequest{
+				Slug: fmt.Sprintf("%d", awesomeArticle.ID),
+			},
+			false,
+			true,
+			false,
+		},
 	}
 
 	for _, tt := range tests {

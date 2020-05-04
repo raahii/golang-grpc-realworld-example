@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/k0kubun/pp"
 	"github.com/raahii/golang-grpc-realworld-example/auth"
 	"github.com/raahii/golang-grpc-realworld-example/model"
 	pb "github.com/raahii/golang-grpc-realworld-example/proto"
@@ -39,7 +40,7 @@ func (h *Handler) CreateArticle(ctx context.Context, req *pb.CreateAritcleReques
 		Title:       ra.GetTitle(),
 		Description: ra.GetDescription(),
 		Body:        ra.GetBody(),
-		UserID:      currentUser.ID,
+		Author:      currentUser,
 		Tags:        tags,
 	}
 
@@ -68,9 +69,9 @@ func (h *Handler) CreateArticle(ctx context.Context, req *pb.CreateAritcleReques
 	pa.Favorited = false
 
 	pa.Author = &pb.Profile{
-		Username:  currentUser.Username,
-		Bio:       currentUser.Bio,
-		Image:     currentUser.Image,
+		Username:  a.Author.Username,
+		Bio:       a.Author.Bio,
+		Image:     a.Author.Image,
 		Following: false,
 	}
 
@@ -88,20 +89,12 @@ func (h *Handler) GetArticle(ctx context.Context, req *pb.GetArticleRequest) (*p
 	}
 
 	var a model.Article
-	err = h.db.Preload("Tags").Find(&a, articleID).Error
+	err = h.db.Preload("Tags").Preload("Author").Find(&a, articleID).Error
 	if err != nil {
 		msg := fmt.Sprintf("requested article (slug=%d) not found", articleID)
 		h.logger.Error().Err(err).Msg(msg)
+		pp.Println(err)
 		return nil, status.Error(codes.InvalidArgument, "invalid article id")
-	}
-
-	// get author
-	var u model.User
-	err = h.db.Find(&u, a.UserID).Error
-	if err != nil {
-		msg := "article author not found"
-		h.logger.Error().Err(err).Msg(msg)
-		return nil, status.Error(codes.NotFound, msg)
 	}
 
 	// bind article
@@ -114,9 +107,9 @@ func (h *Handler) GetArticle(ctx context.Context, req *pb.GetArticleRequest) (*p
 	}
 
 	pa.Author = &pb.Profile{
-		Username:  u.Username,
-		Bio:       u.Bio,
-		Image:     u.Image,
+		Username:  a.Author.Username,
+		Bio:       a.Author.Bio,
+		Image:     a.Author.Image,
 		Following: false,
 	}
 

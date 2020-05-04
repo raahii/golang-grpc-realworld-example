@@ -16,6 +16,7 @@ type Article struct {
 	Description string `gorm:"not null"`
 	Body        string `gorm:"not null"`
 	Tags        []Tag  `gorm:"many2many:article_tags"`
+	Author      User   `gorm:"foreignkey:UserID"`
 	UserID      uint   `gorm:"not null"`
 }
 
@@ -32,10 +33,6 @@ func (a Article) Validate() error {
 		),
 		validation.Field(
 			&a.Tags,
-			validation.Required,
-		),
-		validation.Field(
-			&a.UserID,
 			validation.Required,
 		),
 	)
