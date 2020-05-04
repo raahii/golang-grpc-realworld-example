@@ -197,6 +197,53 @@ func (x *CreateAritcleRequest) GetArticle() *CreateAritcleRequest_Article {
 	return nil
 }
 
+type GetArticleRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Slug string `protobuf:"bytes,1,opt,name=slug,proto3" json:"slug,omitempty"`
+}
+
+func (x *GetArticleRequest) Reset() {
+	*x = GetArticleRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_articles_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *GetArticleRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetArticleRequest) ProtoMessage() {}
+
+func (x *GetArticleRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_articles_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetArticleRequest.ProtoReflect.Descriptor instead.
+func (*GetArticleRequest) Descriptor() ([]byte, []int) {
+	return file_articles_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *GetArticleRequest) GetSlug() string {
+	if x != nil {
+		return x.Slug
+	}
+	return ""
+}
+
 type ArticleResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -208,7 +255,7 @@ type ArticleResponse struct {
 func (x *ArticleResponse) Reset() {
 	*x = ArticleResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_articles_proto_msgTypes[2]
+		mi := &file_articles_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -221,7 +268,7 @@ func (x *ArticleResponse) String() string {
 func (*ArticleResponse) ProtoMessage() {}
 
 func (x *ArticleResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_articles_proto_msgTypes[2]
+	mi := &file_articles_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -234,7 +281,7 @@ func (x *ArticleResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ArticleResponse.ProtoReflect.Descriptor instead.
 func (*ArticleResponse) Descriptor() ([]byte, []int) {
-	return file_articles_proto_rawDescGZIP(), []int{2}
+	return file_articles_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ArticleResponse) GetArticle() *Article {
@@ -258,7 +305,7 @@ type CreateAritcleRequest_Article struct {
 func (x *CreateAritcleRequest_Article) Reset() {
 	*x = CreateAritcleRequest_Article{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_articles_proto_msgTypes[3]
+		mi := &file_articles_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -271,7 +318,7 @@ func (x *CreateAritcleRequest_Article) String() string {
 func (*CreateAritcleRequest_Article) ProtoMessage() {}
 
 func (x *CreateAritcleRequest_Article) ProtoReflect() protoreflect.Message {
-	mi := &file_articles_proto_msgTypes[3]
+	mi := &file_articles_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -359,17 +406,25 @@ var file_articles_proto_rawDesc = []byte{
 	0x52, 0x0b, 0x64, 0x65, 0x73, 0x63, 0x72, 0x69, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x12, 0x0a,
 	0x04, 0x62, 0x6f, 0x64, 0x79, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x62, 0x6f, 0x64,
 	0x79, 0x12, 0x18, 0x0a, 0x07, 0x74, 0x61, 0x67, 0x4c, 0x69, 0x73, 0x74, 0x18, 0x05, 0x20, 0x03,
-	0x28, 0x09, 0x52, 0x07, 0x74, 0x61, 0x67, 0x4c, 0x69, 0x73, 0x74, 0x22, 0x3d, 0x0a, 0x0f, 0x41,
-	0x72, 0x74, 0x69, 0x63, 0x6c, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2a,
-	0x0a, 0x07, 0x61, 0x72, 0x74, 0x69, 0x63, 0x6c, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x28, 0x09, 0x52, 0x07, 0x74, 0x61, 0x67, 0x4c, 0x69, 0x73, 0x74, 0x22, 0x27, 0x0a, 0x11, 0x47,
+	0x65, 0x74, 0x41, 0x72, 0x74, 0x69, 0x63, 0x6c, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x12, 0x12, 0x0a, 0x04, 0x73, 0x6c, 0x75, 0x67, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04,
+	0x73, 0x6c, 0x75, 0x67, 0x22, 0x3d, 0x0a, 0x0f, 0x41, 0x72, 0x74, 0x69, 0x63, 0x6c, 0x65, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2a, 0x0a, 0x07, 0x61, 0x72, 0x74, 0x69, 0x63,
+	0x6c, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x70, 0x72, 0x6f, 0x66, 0x69,
+	0x6c, 0x65, 0x2e, 0x41, 0x72, 0x74, 0x69, 0x63, 0x6c, 0x65, 0x52, 0x07, 0x61, 0x72, 0x74, 0x69,
+	0x63, 0x6c, 0x65, 0x32, 0xb5, 0x01, 0x0a, 0x08, 0x41, 0x72, 0x74, 0x69, 0x63, 0x6c, 0x65, 0x73,
+	0x12, 0x53, 0x0a, 0x0d, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x41, 0x72, 0x74, 0x69, 0x63, 0x6c,
+	0x65, 0x12, 0x1d, 0x2e, 0x70, 0x72, 0x6f, 0x66, 0x69, 0x6c, 0x65, 0x2e, 0x43, 0x72, 0x65, 0x61,
+	0x74, 0x65, 0x41, 0x72, 0x69, 0x74, 0x63, 0x6c, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x1a, 0x10, 0x2e, 0x70, 0x72, 0x6f, 0x66, 0x69, 0x6c, 0x65, 0x2e, 0x41, 0x72, 0x74, 0x69, 0x63,
+	0x6c, 0x65, 0x22, 0x11, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x0b, 0x22, 0x09, 0x2f, 0x61, 0x72, 0x74,
+	0x69, 0x63, 0x6c, 0x65, 0x73, 0x12, 0x54, 0x0a, 0x0a, 0x47, 0x65, 0x74, 0x41, 0x72, 0x74, 0x69,
+	0x63, 0x6c, 0x65, 0x12, 0x1a, 0x2e, 0x70, 0x72, 0x6f, 0x66, 0x69, 0x6c, 0x65, 0x2e, 0x47, 0x65,
+	0x74, 0x41, 0x72, 0x74, 0x69, 0x63, 0x6c, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
 	0x10, 0x2e, 0x70, 0x72, 0x6f, 0x66, 0x69, 0x6c, 0x65, 0x2e, 0x41, 0x72, 0x74, 0x69, 0x63, 0x6c,
-	0x65, 0x52, 0x07, 0x61, 0x72, 0x74, 0x69, 0x63, 0x6c, 0x65, 0x32, 0x5f, 0x0a, 0x08, 0x41, 0x72,
-	0x74, 0x69, 0x63, 0x6c, 0x65, 0x73, 0x12, 0x53, 0x0a, 0x0d, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65,
-	0x41, 0x72, 0x74, 0x69, 0x63, 0x6c, 0x65, 0x12, 0x1d, 0x2e, 0x70, 0x72, 0x6f, 0x66, 0x69, 0x6c,
-	0x65, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x41, 0x72, 0x69, 0x74, 0x63, 0x6c, 0x65, 0x52,
-	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x10, 0x2e, 0x70, 0x72, 0x6f, 0x66, 0x69, 0x6c, 0x65,
-	0x2e, 0x41, 0x72, 0x74, 0x69, 0x63, 0x6c, 0x65, 0x22, 0x11, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x0b,
-	0x22, 0x09, 0x2f, 0x61, 0x72, 0x74, 0x69, 0x63, 0x6c, 0x65, 0x73, 0x42, 0x09, 0x5a, 0x07, 0x2e,
+	0x65, 0x22, 0x18, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x12, 0x12, 0x10, 0x2f, 0x61, 0x72, 0x74, 0x69,
+	0x63, 0x6c, 0x65, 0x73, 0x2f, 0x7b, 0x73, 0x6c, 0x75, 0x67, 0x7d, 0x42, 0x09, 0x5a, 0x07, 0x2e,
 	0x3b, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
@@ -385,25 +440,28 @@ func file_articles_proto_rawDescGZIP() []byte {
 	return file_articles_proto_rawDescData
 }
 
-var file_articles_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_articles_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_articles_proto_goTypes = []interface{}{
 	(*Article)(nil),                      // 0: profile.Article
 	(*CreateAritcleRequest)(nil),         // 1: profile.CreateAritcleRequest
-	(*ArticleResponse)(nil),              // 2: profile.ArticleResponse
-	(*CreateAritcleRequest_Article)(nil), // 3: profile.CreateAritcleRequest.Article
-	(*timestamp.Timestamp)(nil),          // 4: google.protobuf.Timestamp
-	(*Profile)(nil),                      // 5: profile.Profile
+	(*GetArticleRequest)(nil),            // 2: profile.GetArticleRequest
+	(*ArticleResponse)(nil),              // 3: profile.ArticleResponse
+	(*CreateAritcleRequest_Article)(nil), // 4: profile.CreateAritcleRequest.Article
+	(*timestamp.Timestamp)(nil),          // 5: google.protobuf.Timestamp
+	(*Profile)(nil),                      // 6: profile.Profile
 }
 var file_articles_proto_depIdxs = []int32{
-	4, // 0: profile.Article.createdAt:type_name -> google.protobuf.Timestamp
-	4, // 1: profile.Article.updatedAt:type_name -> google.protobuf.Timestamp
-	5, // 2: profile.Article.author:type_name -> profile.Profile
-	3, // 3: profile.CreateAritcleRequest.article:type_name -> profile.CreateAritcleRequest.Article
+	5, // 0: profile.Article.createdAt:type_name -> google.protobuf.Timestamp
+	5, // 1: profile.Article.updatedAt:type_name -> google.protobuf.Timestamp
+	6, // 2: profile.Article.author:type_name -> profile.Profile
+	4, // 3: profile.CreateAritcleRequest.article:type_name -> profile.CreateAritcleRequest.Article
 	0, // 4: profile.ArticleResponse.article:type_name -> profile.Article
 	1, // 5: profile.Articles.CreateArticle:input_type -> profile.CreateAritcleRequest
-	0, // 6: profile.Articles.CreateArticle:output_type -> profile.Article
-	6, // [6:7] is the sub-list for method output_type
-	5, // [5:6] is the sub-list for method input_type
+	2, // 6: profile.Articles.GetArticle:input_type -> profile.GetArticleRequest
+	0, // 7: profile.Articles.CreateArticle:output_type -> profile.Article
+	0, // 8: profile.Articles.GetArticle:output_type -> profile.Article
+	7, // [7:9] is the sub-list for method output_type
+	5, // [5:7] is the sub-list for method input_type
 	5, // [5:5] is the sub-list for extension type_name
 	5, // [5:5] is the sub-list for extension extendee
 	0, // [0:5] is the sub-list for field type_name
@@ -441,7 +499,7 @@ func file_articles_proto_init() {
 			}
 		}
 		file_articles_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ArticleResponse); i {
+			switch v := v.(*GetArticleRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -453,6 +511,18 @@ func file_articles_proto_init() {
 			}
 		}
 		file_articles_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ArticleResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_articles_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*CreateAritcleRequest_Article); i {
 			case 0:
 				return &v.state
@@ -471,7 +541,7 @@ func file_articles_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_articles_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   4,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
@@ -498,6 +568,7 @@ const _ = grpc.SupportPackageIsVersion6
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type ArticlesClient interface {
 	CreateArticle(ctx context.Context, in *CreateAritcleRequest, opts ...grpc.CallOption) (*Article, error)
+	GetArticle(ctx context.Context, in *GetArticleRequest, opts ...grpc.CallOption) (*Article, error)
 }
 
 type articlesClient struct {
@@ -517,9 +588,19 @@ func (c *articlesClient) CreateArticle(ctx context.Context, in *CreateAritcleReq
 	return out, nil
 }
 
+func (c *articlesClient) GetArticle(ctx context.Context, in *GetArticleRequest, opts ...grpc.CallOption) (*Article, error) {
+	out := new(Article)
+	err := c.cc.Invoke(ctx, "/profile.Articles/GetArticle", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ArticlesServer is the server API for Articles service.
 type ArticlesServer interface {
 	CreateArticle(context.Context, *CreateAritcleRequest) (*Article, error)
+	GetArticle(context.Context, *GetArticleRequest) (*Article, error)
 }
 
 // UnimplementedArticlesServer can be embedded to have forward compatible implementations.
@@ -528,6 +609,9 @@ type UnimplementedArticlesServer struct {
 
 func (*UnimplementedArticlesServer) CreateArticle(context.Context, *CreateAritcleRequest) (*Article, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateArticle not implemented")
+}
+func (*UnimplementedArticlesServer) GetArticle(context.Context, *GetArticleRequest) (*Article, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetArticle not implemented")
 }
 
 func RegisterArticlesServer(s *grpc.Server, srv ArticlesServer) {
@@ -552,6 +636,24 @@ func _Articles_CreateArticle_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Articles_GetArticle_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetArticleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArticlesServer).GetArticle(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/profile.Articles/GetArticle",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArticlesServer).GetArticle(ctx, req.(*GetArticleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Articles_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "profile.Articles",
 	HandlerType: (*ArticlesServer)(nil),
@@ -559,6 +661,10 @@ var _Articles_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateArticle",
 			Handler:    _Articles_CreateArticle_Handler,
+		},
+		{
+			MethodName: "GetArticle",
+			Handler:    _Articles_GetArticle_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

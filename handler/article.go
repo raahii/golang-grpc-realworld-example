@@ -74,3 +74,8 @@ func (h *Handler) CreateArticle(ctx context.Context, req *pb.CreateAritcleReques
 
 	return &pb.ArticleResponse{Article: &pa}, nil
 }
+
+// GetArticle gets a article
+func (h *Handler) GetArticle(ctx context.Context, req *pb.GetArticleRequest) (*pb.ArticleResponse, error) {
+	return &pb.ArticleResponse{}, nil
+}

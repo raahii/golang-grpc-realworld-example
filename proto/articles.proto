@@ -28,6 +28,11 @@ service Articles {
       post: "/articles"
     };
   }
+  rpc GetArticle (GetArticleRequest) returns (Article) {
+    option (google.api.http) = {
+      get: "/articles/{slug}"
+    };
+  }
 }
 
 message CreateAritcleRequest {
@@ -39,6 +44,10 @@ message CreateAritcleRequest {
   }
 
   Article article = 1;
+}
+
+message GetArticleRequest {
+  string slug = 1;
 }
 
 message ArticleResponse {

@@ -32,6 +32,36 @@
           "Articles"
         ]
       }
+    },
+    "/articles/{slug}": {
+      "get": {
+        "operationId": "GetArticle",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/profileArticle"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Articles"
+        ]
+      }
     }
   },
   "definitions": {
