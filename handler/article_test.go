@@ -75,10 +75,10 @@ func TestCreateArticle(t *testing.T) {
 		assert.Equal(t, got.GetDescription(), expected.GetDescription())
 		assert.Equal(t, got.GetBody(), expected.GetBody())
 		assert.Equal(t, got.GetTagList(), expected.GetTagList())
-		assert.True(t, got.GetCreatedAt().GetSeconds() > requestTime.GetSeconds())
-		assert.True(t, got.GetUpdatedAt().GetSeconds() > requestTime.GetSeconds())
+		assert.True(t, got.GetCreatedAt().GetNanos() > requestTime.GetNanos())
+		assert.True(t, got.GetUpdatedAt().GetNanos() > requestTime.GetNanos())
 		assert.False(t, got.GetFavorited())
-		assert.Equal(t, got.GetFavoriteCount(), 0)
+		assert.Equal(t, got.GetFavoriteCount(), int64(0))
 
 		author := got.GetAuthor()
 		assert.Equal(t, author.GetUsername(), fooUser.Username)
