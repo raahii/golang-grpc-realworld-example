@@ -2,6 +2,8 @@ package handler
 
 import (
 	"context"
+	"fmt"
+	"strconv"
 
 	"github.com/raahii/golang-grpc-realworld-example/auth"
 	"github.com/raahii/golang-grpc-realworld-example/model"
@@ -77,5 +79,74 @@ func (h *Handler) CreateArticle(ctx context.Context, req *pb.CreateAritcleReques
 
 // GetArticle gets a article
 func (h *Handler) GetArticle(ctx context.Context, req *pb.GetArticleRequest) (*pb.ArticleResponse, error) {
-	return &pb.ArticleResponse{}, nil
+	// get article
+	articleID, err := strconv.Atoi(req.GetSlug())
+	if err != nil {
+		msg := fmt.Sprintf("cannot convert slug (%s) into integer", req.GetSlug())
+		h.logger.Error().Err(err).Msg(msg)
+		return nil, status.Error(codes.InvalidArgument, "invalid article id")
+	}
+
+	var a model.Article
+	err = h.db.Preload("Tags").Find(&a, articleID).Error
+	if err != nil {
+		msg := fmt.Sprintf("requested article (slug=%d) not found", articleID)
+		h.logger.Error().Err(err).Msg(msg)
+		return nil, status.Error(codes.InvalidArgument, "invalid article id")
+	}
+
+	// get author
+	var u model.User
+	err = h.db.Find(&u, a.UserID).Error
+	if err != nil {
+		msg := "article author not found"
+		h.logger.Error().Err(err).Msg(msg)
+		return nil, status.Error(codes.NotFound, msg)
+	}
+
+	// bind article
+	var pa pb.Article
+	err = a.BindTo(&pa)
+	if err != nil {
+		msg := "failed to convert model.User to pb.User"
+		h.logger.Error().Err(err).Msg(msg)
+		return nil, status.Error(codes.Aborted, "internal server error")
+	}
+
+	pa.Author = &pb.Profile{
+		Username:  u.Username,
+		Bio:       u.Bio,
+		Image:     u.Image,
+		Following: false,
+	}
+
+	// get current user if exists
+	userID, err := auth.GetUserID(ctx)
+	if err != nil {
+		pa.Favorited = false
+		pa.Author.Following = false
+		return &pb.ArticleResponse{Article: &pa}, nil
+	}
+
+	var currentUser model.User
+	err = h.db.Find(&currentUser, userID).Error
+	if err != nil {
+		msg := fmt.Sprintf("token is valid but the user not found")
+		h.logger.Error().Err(err).Msg(msg)
+		return nil, status.Error(codes.NotFound, msg)
+	}
+
+	// TODO: set favorite field
+	pa.Favorited = false
+
+	// set following field
+	var count int
+	err = h.db.Table("follows").Where("from_user_id = ? AND to_user_id = ?", currentUser.ID, a.UserID).Count(&count).Error
+	if err != nil {
+		h.logger.Fatal().Err(err).Msg("failed to find following relationship")
+		return nil, status.Error(codes.Aborted, "internal server error")
+	}
+	pa.Author.Following = count >= 1
+
+	return &pb.ArticleResponse{Article: &pa}, nil
 }

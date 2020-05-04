@@ -43,7 +43,7 @@ func (a Article) Validate() error {
 
 // BindTo generates pb.Article
 func (a *Article) BindTo(pa *pb.Article) error {
-	pa.Slug = string(a.ID)
+	pa.Slug = fmt.Sprintf("%d", a.ID)
 	pa.Title = a.Title
 	pa.Description = a.Description
 	pa.Body = a.Body

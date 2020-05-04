@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"github.com/golang/protobuf/ptypes"
@@ -136,7 +137,7 @@ func TestGetArticle(t *testing.T) {
 			"get article from unauthenticated user: success",
 			nil,
 			&pb.GetArticleRequest{
-				Slug: string(awesomeArticle.ID),
+				Slug: fmt.Sprintf("%d", awesomeArticle.ID),
 			},
 			false,
 			false,
@@ -190,7 +191,7 @@ func TestGetArticle(t *testing.T) {
 		}
 
 		got := resp.GetArticle()
-		assert.Equal(t, string(awesomeArticle.ID), got.GetSlug())
+		assert.Equal(t, fmt.Sprintf("%d", awesomeArticle.ID), got.GetSlug())
 		assert.Equal(t, awesomeArticle.Title, got.GetTitle())
 		assert.Equal(t, awesomeArticle.Description, got.GetDescription())
 		assert.Equal(t, awesomeArticle.Body, got.GetBody())
