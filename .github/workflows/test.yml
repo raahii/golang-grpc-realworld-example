@@ -19,16 +19,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Cache modules
-        uses: actions/cache@v1
-        with:
-          path: /home/runner/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
+      # - name: Cache modules
+      #   uses: actions/cache@v1
+      #   with:
+      #     path: /home/runner/go/pkg/mod
+      #     key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-go-
 
       - name: Create database
-        run: docker-compose up -d db
+        run: docker-compose up -d db-test
 
       - name: Test
-        run: go test -v ./...
+        run: make test

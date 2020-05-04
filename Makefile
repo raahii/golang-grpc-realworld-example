@@ -12,4 +12,4 @@ proto:
 		./proto/*.proto
 
 test:
-	go test -v ./handler
+	go test -v ./handler -parallel 4

@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"testing"
 
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
 	"github.com/raahii/golang-grpc-realworld-example/db"
 	"github.com/rs/zerolog"
@@ -21,7 +22,6 @@ func setUp(t *testing.T) (*Handler, func(t *testing.T)) {
 	if err != nil {
 		t.Fatal(fmt.Errorf("failed to initialize database: %w", err))
 	}
-	db.AutoMigrate(d)
 
 	return New(&l, d), func(t *testing.T) {
 		err := db.DropTestDB(d)

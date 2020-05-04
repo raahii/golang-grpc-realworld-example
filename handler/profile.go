@@ -11,7 +11,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// show user profile
+// ShowProfile gets a profile
 func (h *Handler) ShowProfile(ctx context.Context, req *pb.ShowProfileRequest) (*pb.ProfileResponse, error) {
 	h.logger.Info().Msgf("Show profile | req: %+v\n", req)
 
@@ -53,7 +53,7 @@ func (h *Handler) ShowProfile(ctx context.Context, req *pb.ShowProfileRequest) (
 	return &pb.ProfileResponse{Profile: &p}, nil
 }
 
-// follow user
+// FollowUser follow a user
 func (h *Handler) FollowUser(ctx context.Context, req *pb.FollowRequest) (*pb.ProfileResponse, error) {
 	h.logger.Info().Msgf("Follow User | req: %+v\n", req)
 
@@ -99,7 +99,7 @@ func (h *Handler) FollowUser(ctx context.Context, req *pb.FollowRequest) (*pb.Pr
 	return &pb.ProfileResponse{Profile: &p}, nil
 }
 
-// follow user
+// UnfollowUser unfollow a user
 func (h *Handler) UnfollowUser(ctx context.Context, req *pb.UnfollowRequest) (*pb.ProfileResponse, error) {
 	h.logger.Info().Msgf("Unfollow User | req: %+v\n", req)
 

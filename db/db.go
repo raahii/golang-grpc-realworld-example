@@ -1,20 +1,26 @@
 package db
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"sync"
 	"time"
 
 	"os"
 
 	"github.com/BurntSushi/toml"
+	"github.com/google/uuid"
 	"github.com/jinzhu/gorm"
 	"github.com/joho/godotenv"
 	"github.com/raahii/golang-grpc-realworld-example/model"
 
-	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"github.com/DATA-DOG/go-txdb"
 )
+
+var txdbInitialized bool
+var mutex sync.Mutex
 
 func dsn() (string, error) {
 	host := os.Getenv("DB_HOST")
@@ -49,6 +55,7 @@ func dsn() (string, error) {
 		user, password, host, port, name, options), nil
 }
 
+// New return mysql connection
 func New() (*gorm.DB, error) {
 	s, err := dsn()
 	if err != nil {
@@ -74,19 +81,54 @@ func New() (*gorm.DB, error) {
 	return d, nil
 }
 
+// NewTestDB return mysql connection wrapped txdb
 func NewTestDB() (*gorm.DB, error) {
-	//TODO: replace test database
 	err := godotenv.Load("../env/local.env")
 	if err != nil {
 		return nil, err
 	}
-	return New()
+
+	s, err := dsn()
+	if err != nil {
+		return nil, err
+	}
+
+	mutex.Lock()
+	if !txdbInitialized {
+		_d, err := gorm.Open("mysql", s)
+		if err != nil {
+			return nil, err
+		}
+		AutoMigrate(_d)
+
+		txdb.Register("txdb", "mysql", s)
+		txdbInitialized = true
+	}
+	mutex.Unlock()
+
+	c, err := sql.Open("txdb", uuid.New().String())
+	if err != nil {
+		return nil, err
+	}
+
+	d, err := gorm.Open("mysql", c)
+	if err != nil {
+		return nil, err
+	}
+
+	d.DB().SetMaxIdleConns(3)
+	d.LogMode(false)
+
+	return d, nil
 }
 
+// DropTestDB close connection
 func DropTestDB(d *gorm.DB) error {
-	return d.DropTableIfExists("users", "follows").Error
+	d.Close()
+	return nil
 }
 
+// AutoMigrate is a wrapper of (*gorm.DB).AutoMigrate
 func AutoMigrate(db *gorm.DB) error {
 	err := db.AutoMigrate(
 		&model.User{},
@@ -97,6 +139,7 @@ func AutoMigrate(db *gorm.DB) error {
 	return nil
 }
 
+// Seed create initial data to the database
 func Seed(db *gorm.DB) error {
 	users := struct {
 		Users []model.User

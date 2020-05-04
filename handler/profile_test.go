@@ -208,14 +208,14 @@ func TestUnfollowUser(t *testing.T) {
 			},
 			false,
 		},
-		// {
-		// 	"fooUser follows fooUser: cannnot unfollow myself",
-		// 	&pb.UnfollowRequest{
-		// 		Username: fooUser.Username,
-		// 	},
-		// 	nil,
-		// 	true,
-		// },
+		{
+			"fooUser follows fooUser: cannnot unfollow myself",
+			&pb.UnfollowRequest{
+				Username: fooUser.Username,
+			},
+			nil,
+			true,
+		},
 	}
 
 	token, err := auth.GenerateToken(fooUser.ID)

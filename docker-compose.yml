@@ -13,6 +13,7 @@ services:
       - ".:/go/app"
     links:
       - db
+      - db-test
 
   gateway:
     build:
@@ -33,3 +34,12 @@ services:
       MYSQL_DATABASE: app
     ports:
       - "3306:3306"
+
+  db-test:
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: app_test
+    ports:
+      - "3340:3306"

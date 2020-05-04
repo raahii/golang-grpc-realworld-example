@@ -5,6 +5,7 @@ import (
 	"net"
 	"os"
 
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/raahii/golang-grpc-realworld-example/db"
 	"github.com/raahii/golang-grpc-realworld-example/handler"
 	pb "github.com/raahii/golang-grpc-realworld-example/proto"

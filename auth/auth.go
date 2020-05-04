@@ -10,24 +10,26 @@ import (
 	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 )
 
-var JWTSecret = []byte("!!SECRET!!")
+var jwtSecret = []byte("!!SECRET!!")
 
-type Claims struct {
+type claims struct {
 	UserID uint `json:"user_id"`
 	jwt.StandardClaims
 }
 
+// GenerateToken generates a new token
 func GenerateToken(id uint) (string, error) {
 	return generateToken(id, time.Now())
 }
 
+// GenerateTokenWithTime generates a new token with expired date computed withspecified time
 func GenerateTokenWithTime(id uint, t time.Time) (string, error) {
 	// for test
 	return generateToken(id, t)
 }
 
 func generateToken(id uint, now time.Time) (string, error) {
-	claims := &Claims{
+	claims := &claims{
 		id,
 		jwt.StandardClaims{
 			ExpiresAt: now.Add(time.Hour * 72).Unix(),
@@ -35,7 +37,7 @@ func generateToken(id uint, now time.Time) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	t, err := token.SignedString(JWTSecret)
+	t, err := token.SignedString(jwtSecret)
 	if err != nil {
 		return "", err
 	}
@@ -43,14 +45,15 @@ func generateToken(id uint, now time.Time) (string, error) {
 	return t, nil
 }
 
+// GetUserID gets user id string from request context
 func GetUserID(ctx context.Context) (uint, error) {
 	tokenString, err := grpc_auth.AuthFromMD(ctx, "Token")
 	if err != nil {
 		return 0, err
 	}
 
-	token, err := jwt.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-		return JWTSecret, nil
+	token, err := jwt.ParseWithClaims(tokenString, &claims{}, func(token *jwt.Token) (interface{}, error) {
+		return jwtSecret, nil
 	})
 	if !token.Valid {
 		if ve, ok := err.(*jwt.ValidationError); ok {
@@ -66,14 +69,14 @@ func GetUserID(ctx context.Context) (uint, error) {
 		}
 	}
 
-	claims, ok := token.Claims.(*Claims)
+	c, ok := token.Claims.(*claims)
 	if !ok {
 		return 0, errors.New("invalid token: cannot map token to claims")
 	}
 
-	if claims.ExpiresAt < time.Now().Unix() {
+	if c.ExpiresAt < time.Now().Unix() {
 		return 0, errors.New("token expired")
 	}
 
-	return claims.UserID, nil
+	return c.UserID, nil
 }
