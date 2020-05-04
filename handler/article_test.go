@@ -72,19 +72,19 @@ func TestCreateArticle(t *testing.T) {
 		got := resp.GetArticle()
 		expected := tt.req.GetArticle()
 		assert.NotEmpty(t, got.GetSlug())
-		assert.Equal(t, got.GetTitle(), expected.GetTitle())
-		assert.Equal(t, got.GetDescription(), expected.GetDescription())
-		assert.Equal(t, got.GetBody(), expected.GetBody())
-		assert.Equal(t, got.GetTagList(), expected.GetTagList())
+		assert.Equal(t, expected.GetTitle(), got.GetTitle())
+		assert.Equal(t, expected.GetDescription(), got.GetDescription())
+		assert.Equal(t, expected.GetBody(), got.GetBody())
+		assert.Equal(t, expected.GetTagList(), got.GetTagList())
 		assert.True(t, got.GetCreatedAt().GetNanos() > requestTime.GetNanos())
 		assert.True(t, got.GetUpdatedAt().GetNanos() > requestTime.GetNanos())
 		assert.False(t, got.GetFavorited())
-		assert.Equal(t, got.GetFavoriteCount(), int64(0))
+		assert.Equal(t, int64(0), got.GetFavoriteCount())
 
 		author := got.GetAuthor()
-		assert.Equal(t, author.GetUsername(), fooUser.Username)
-		assert.Equal(t, author.GetBio(), fooUser.Bio)
-		assert.Equal(t, author.GetImage(), fooUser.Image)
+		assert.Equal(t, fooUser.Username, author.GetUsername())
+		assert.Equal(t, fooUser.Bio, author.GetBio())
+		assert.Equal(t, fooUser.Image, author.GetImage())
 		assert.False(t, author.GetFollowing())
 	}
 }
@@ -241,14 +241,15 @@ func TestGetArticles(t *testing.T) {
 
 	articles := make([]*model.Article, 10)
 	for i := 0; i < 10; i++ {
+		idStr := fmt.Sprintf("%d", i)
 		a := model.Article{
-			Title:       string(i),
-			Description: string(i),
-			Body:        string(i),
-			Tags:        []model.Tag{tag},
+			Title:       idStr,
+			Description: idStr,
+			Body:        idStr,
 		}
-		if i >= 5 {
+		if i < 5 {
 			a.Author = fooUser
+			a.Tags = []model.Tag{tag}
 		} else {
 			a.Author = barUser
 		}
@@ -280,6 +281,54 @@ func TestGetArticles(t *testing.T) {
 			articles,
 			false,
 		},
+		{
+			"get articles with limit and offset",
+			&pb.GetArticlesRequest{
+				Tag:       "",
+				Author:    "",
+				Favorited: "",
+				Limit:     5,
+				Offset:    5,
+			},
+			articles[5:10],
+			false,
+		},
+		{
+			"get articles with tag",
+			&pb.GetArticlesRequest{
+				Tag:       "hoge",
+				Author:    "",
+				Favorited: "",
+				Limit:     0,
+				Offset:    0,
+			},
+			articles[5:10],
+			false,
+		},
+		{
+			"get articles with author",
+			&pb.GetArticlesRequest{
+				Tag:       "",
+				Author:    "bar",
+				Favorited: "",
+				Limit:     0,
+				Offset:    0,
+			},
+			articles[0:5],
+			false,
+		},
+		{
+			"get articles with various queries",
+			&pb.GetArticlesRequest{
+				Tag:       "hoge",
+				Author:    "foo",
+				Favorited: "",
+				Limit:     2,
+				Offset:    1,
+			},
+			articles[6:8],
+			false,
+		},
 	}
 
 	for _, tt := range tests {
@@ -299,13 +348,12 @@ func TestGetArticles(t *testing.T) {
 		}
 
 		assert.Len(t, resp.GetArticles(), len(tt.expected))
-
 		for i := 0; i < len(tt.expected); i++ {
 			got := resp.GetArticles()[i]
 			expected := tt.expected[i]
 
-			assert.Equal(t, got.Title, expected.Title)
-			assert.Equal(t, got.Author.Username, expected.Author.Username)
+			assert.Equal(t, expected.Title, got.GetTitle())
+			assert.Equal(t, expected.Author.Username, got.GetAuthor().GetUsername())
 		}
 	}
 }

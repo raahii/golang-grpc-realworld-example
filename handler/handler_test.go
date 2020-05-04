@@ -33,7 +33,7 @@ func setUp(t *testing.T) (*Handler, func(t *testing.T)) {
 
 func ctxWithToken(ctx context.Context, token string) context.Context {
 	scheme := "Token"
-	md := metadata.Pairs("authorization", fmt.Sprintf("%s %v", scheme, token))
+	md := metadata.Pairs("authorization", fmt.Sprintf("%s %s", scheme, token))
 	nCtx := metautils.NiceMD(md).ToIncoming(ctx)
 	return nCtx
 }

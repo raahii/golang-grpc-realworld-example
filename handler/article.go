@@ -59,20 +59,11 @@ func (h *Handler) CreateArticle(ctx context.Context, req *pb.CreateAritcleReques
 	}
 
 	var pa pb.Article
-	err = a.BindTo(&pa)
+	err = a.BindTo(&pa, &currentUser, h.db)
 	if err != nil {
 		msg := "Failed to convert model.User to pb.User"
 		h.logger.Error().Err(err).Msg(msg)
 		return nil, status.Error(codes.Aborted, "internal server error")
-	}
-
-	pa.Favorited = false
-
-	pa.Author = &pb.Profile{
-		Username:  a.Author.Username,
-		Bio:       a.Author.Bio,
-		Image:     a.Author.Image,
-		Following: false,
 	}
 
 	return &pb.ArticleResponse{Article: &pa}, nil
@@ -97,54 +88,79 @@ func (h *Handler) GetArticle(ctx context.Context, req *pb.GetArticleRequest) (*p
 		return nil, status.Error(codes.InvalidArgument, "invalid article id")
 	}
 
+	var currentUser *model.User
+
+	// get current user if exists
+	userID, err := auth.GetUserID(ctx)
+	if err == nil {
+		var u model.User
+		err = h.db.Find(&u, userID).Error
+		if err != nil {
+			msg := fmt.Sprintf("token is valid but the user not found")
+			h.logger.Error().Err(err).Msg(msg)
+			return nil, status.Error(codes.NotFound, msg)
+		}
+		currentUser = &u
+	}
+
 	// bind article
 	var pa pb.Article
-	err = a.BindTo(&pa)
+	err = a.BindTo(&pa, currentUser, h.db)
 	if err != nil {
 		msg := "failed to convert model.User to pb.User"
 		h.logger.Error().Err(err).Msg(msg)
 		return nil, status.Error(codes.Aborted, "internal server error")
 	}
 
-	pa.Author = &pb.Profile{
-		Username:  a.Author.Username,
-		Bio:       a.Author.Bio,
-		Image:     a.Author.Image,
-		Following: false,
-	}
-
-	// get current user if exists
-	userID, err := auth.GetUserID(ctx)
-	if err != nil {
-		pa.Favorited = false
-		pa.Author.Following = false
-		return &pb.ArticleResponse{Article: &pa}, nil
-	}
-
-	var currentUser model.User
-	err = h.db.Find(&currentUser, userID).Error
-	if err != nil {
-		msg := fmt.Sprintf("token is valid but the user not found")
-		h.logger.Error().Err(err).Msg(msg)
-		return nil, status.Error(codes.NotFound, msg)
-	}
-
-	// TODO: set favorite field
-	pa.Favorited = false
-
-	// set following field
-	var count int
-	err = h.db.Table("follows").Where("from_user_id = ? AND to_user_id = ?", currentUser.ID, a.UserID).Count(&count).Error
-	if err != nil {
-		h.logger.Fatal().Err(err).Msg("failed to find following relationship")
-		return nil, status.Error(codes.Aborted, "internal server error")
-	}
-	pa.Author.Following = count >= 1
-
 	return &pb.ArticleResponse{Article: &pa}, nil
 }
 
 // GetArticles gets recent articles globally
 func (h *Handler) GetArticles(ctx context.Context, req *pb.GetArticlesRequest) (*pb.ArticlesResponse, error) {
-	return &pb.ArticlesResponse{}, nil
+	limitQuery := req.GetLimit()
+	if limitQuery == 0 {
+		limitQuery = 20
+	}
+	offsetQuery := req.GetOffset()
+
+	d := h.db.Preload("Author")
+
+	// author query (has one)
+	if req.GetAuthor() != "" {
+		d = d.Joins("join users on articles.user_id = users.id").
+			Where("users.username = ?", req.GetAuthor())
+	}
+
+	// tag query (many to many)
+	if req.GetTag() != "" {
+		d = d.Joins(
+			"join article_tags on articles.id = article_tags.article_id "+
+				"join tags on tags.id = article_tags.tag_id").
+			Where("tags.name = ?", req.GetTag())
+	}
+
+	// TODO: favorite query
+
+	// offset query, limit query
+	d = d.Offset(offsetQuery).Limit(limitQuery)
+
+	var as []model.Article
+	if err := d.Find(&as).Error; err != nil {
+		h.logger.Error().Err(err).Msg("failed to search articles in the database")
+		pp.Println(err)
+		return nil, status.Error(codes.Aborted, "internal server error")
+	}
+
+	pas := make([]*pb.Article, 0, len(as))
+	for _, a := range as {
+		var pa pb.Article
+		err := a.BindTo(&pa, nil, nil)
+		if err != nil {
+			h.logger.Error().Err(err).Msg("failed to bind model.Article to pb.Article")
+			return nil, status.Error(codes.Aborted, "internal server error")
+		}
+		pas = append(pas, &pa)
+	}
+
+	return &pb.ArticlesResponse{Articles: pas}, nil
 }
