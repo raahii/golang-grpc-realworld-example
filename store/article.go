@@ -17,7 +17,7 @@ func NewArticleStore(db *gorm.DB) *ArticleStore {
 	}
 }
 
-// GetByID finds a article from id
+// GetByID finds an article from id
 func (s *ArticleStore) GetByID(id uint) (*model.Article, error) {
 	var m model.Article
 	err := s.db.Preload("Tags").Preload("Author").Find(&m, id).Error
@@ -27,9 +27,14 @@ func (s *ArticleStore) GetByID(id uint) (*model.Article, error) {
 	return &m, nil
 }
 
-// Create creates a article
+// Create creates an article
 func (s *ArticleStore) Create(m *model.Article) error {
 	return s.db.Create(&m).Error
+}
+
+// Update updates an article
+func (s *ArticleStore) Update(m *model.Article) error {
+	return s.db.Model(&m).Update(&m).Error
 }
 
 // GetArticles get global articles

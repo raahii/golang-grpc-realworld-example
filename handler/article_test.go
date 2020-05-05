@@ -371,13 +371,19 @@ func TestUpdateArticle(t *testing.T) {
 		Password: "secret",
 	}
 
+	barUser := model.User{
+		Username: "bar",
+		Email:    "bar@example.com",
+		Password: "secret",
+	}
+
 	for _, u := range []*model.User{&fooUser} {
 		if err := h.us.Create(u); err != nil {
 			t.Fatalf("failed to create initial user record: %v", err)
 		}
 	}
 
-	a := model.Article{
+	af1 := model.Article{
 		Title:       "original title",
 		Description: "original desc",
 		Body:        "original body",
@@ -385,7 +391,23 @@ func TestUpdateArticle(t *testing.T) {
 		Tags:        []model.Tag{model.Tag{Name: "hoge"}},
 	}
 
-	for _, a := range []*model.Article{&a} {
+	af2 := model.Article{
+		Title:       "original title",
+		Description: "original desc",
+		Body:        "original body",
+		Author:      fooUser,
+		Tags:        []model.Tag{model.Tag{Name: "hoge"}},
+	}
+
+	ab := model.Article{
+		Title:       "original title",
+		Description: "original desc",
+		Body:        "original body",
+		Author:      barUser,
+		Tags:        []model.Tag{model.Tag{Name: "hoge"}},
+	}
+
+	for _, a := range []*model.Article{&af1, &af2, &ab} {
 		if err := h.as.Create(a); err != nil {
 			t.Fatalf("failed to create initial article record: %v", err)
 		}
@@ -401,17 +423,54 @@ func TestUpdateArticle(t *testing.T) {
 			"update article: success",
 			&pb.UpdateArticleRequest{
 				Article: &pb.UpdateArticleRequest_Article{
-					Title: "modified title",
+					Slug:        fmt.Sprintf("%d", af1.ID),
+					Title:       "modified title",
+					Description: "modified desc",
+					Body:        "modified body",
 				},
 			},
 			&pb.Article{
+				Slug:        fmt.Sprintf("%d", af1.ID),
 				Title:       "modified title",
+				Description: "modified desc",
+				Body:        "modified body",
+				Author:      fooUser.ProtoProfile(false),
+				TagList:     []string{"hoge"},
+			},
+			false,
+		},
+		{
+			"update article with zero-values: no changes",
+			&pb.UpdateArticleRequest{
+				Article: &pb.UpdateArticleRequest_Article{
+					Slug:        fmt.Sprintf("%d", af2.ID),
+					Title:       "",
+					Description: "",
+					Body:        "",
+				},
+			},
+			&pb.Article{
+				Slug:        fmt.Sprintf("%d", af2.ID),
+				Title:       "original title",
 				Description: "original desc",
 				Body:        "original body",
 				Author:      fooUser.ProtoProfile(false),
 				TagList:     []string{"hoge"},
 			},
 			false,
+		},
+		{
+			"update other user's article: forbidden",
+			&pb.UpdateArticleRequest{
+				Article: &pb.UpdateArticleRequest_Article{
+					Slug:        fmt.Sprintf("%d", ab.ID),
+					Title:       "modified title",
+					Description: "modified desc",
+					Body:        "modified body",
+				},
+			},
+			nil,
+			true,
 		},
 	}
 

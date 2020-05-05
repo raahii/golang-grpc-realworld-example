@@ -38,6 +38,21 @@ func (a Article) Validate() error {
 	)
 }
 
+// Overwrite overwrite each field if it's not zero-value
+func (a *Article) Overwrite(title, description, body string) {
+	if title != "" {
+		a.Title = title
+	}
+
+	if description != "" {
+		a.Description = description
+	}
+
+	if body != "" {
+		a.Body = body
+	}
+}
+
 // BindTo generates pb.Article
 func (a *Article) BindTo(pa *pb.Article, requestUser *User, db *gorm.DB) error {
 	pa.Slug = fmt.Sprintf("%d", a.ID)
