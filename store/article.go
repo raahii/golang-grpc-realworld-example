@@ -38,7 +38,7 @@ func (s *ArticleStore) Update(m *model.Article) error {
 }
 
 // GetArticles get global articles
-func (s *ArticleStore) GetArticles(tagName, username string, limit, offset int64) ([]model.Article, error) {
+func (s *ArticleStore) GetArticles(tagName, username string, favoritedBy *model.User, limit, offset int64) ([]model.Article, error) {
 	d := s.db.Preload("Author")
 
 	// author query (has one)
@@ -55,7 +55,25 @@ func (s *ArticleStore) GetArticles(tagName, username string, limit, offset int64
 			Where("tags.name = ?", tagName)
 	}
 
-	// TODO: favorite query
+	// favorited query
+	if favoritedBy != nil {
+		rows, err := s.db.Select("article_id").
+			Table("favorite_articles").
+			Where("user_id = ?", favoritedBy.ID).
+			Offset(offset).Limit(limit).Rows()
+		if err != nil {
+			return []model.Article{}, err
+		}
+		defer rows.Close()
+
+		var ids []uint
+		for rows.Next() {
+			var id uint
+			rows.Scan(&id)
+			ids = append(ids, id)
+		}
+		d = d.Where("id in (?)", ids)
+	}
 
 	// offset query, limit query
 	d = d.Offset(offset).Limit(limit)
@@ -85,7 +103,20 @@ func (s *ArticleStore) Delete(m *model.Article) error {
 	return s.db.Delete(m).Error
 }
 
-// AddFavorite add a favorite user to an article
+// IsFavorited returns whether the article is favorited by the user
+func (s *ArticleStore) IsFavorited(a *model.Article, u *model.User) (bool, error) {
+	var count int
+	err := s.db.Table("favorite_articles").
+		Where("article_id = ? AND user_id = ?", a.ID, u.ID).
+		Count(&count).Error
+	if err != nil {
+		return false, err
+	}
+
+	return count > 0, nil
+}
+
+// AddFavorite favorite an article
 func (s *ArticleStore) AddFavorite(a *model.Article, u *model.User) error {
 	tx := s.db.Begin()
 

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/k0kubun/pp"
 	"github.com/raahii/golang-grpc-realworld-example/auth"
 	"github.com/raahii/golang-grpc-realworld-example/model"
 	pb "github.com/raahii/golang-grpc-realworld-example/proto"
@@ -89,7 +88,6 @@ func (h *Handler) GetArticle(ctx context.Context, req *pb.GetArticleRequest) (*p
 	if err != nil {
 		msg := fmt.Sprintf("requested article (slug=%d) not found", articleID)
 		h.logger.Error().Err(err).Msg(msg)
-		pp.Println(err)
 		return nil, status.Error(codes.InvalidArgument, "invalid article id")
 	}
 
@@ -109,7 +107,12 @@ func (h *Handler) GetArticle(ctx context.Context, req *pb.GetArticleRequest) (*p
 	}
 
 	// get whether the article is current user's favorite
-	favorited := false
+	favorited, err := h.as.IsFavorited(article, currentUser)
+	if err != nil {
+		msg := "failed to get favorited status"
+		h.logger.Error().Err(err).Msg(msg)
+		return nil, status.Error(codes.Aborted, "internal server error")
+	}
 	pa := article.ProtoArticle(favorited)
 
 	// get whether current user follows article author
@@ -133,7 +136,17 @@ func (h *Handler) GetArticles(ctx context.Context, req *pb.GetArticlesRequest) (
 		limitQuery = 20
 	}
 
-	as, err := h.as.GetArticles(req.GetTag(), req.GetAuthor(), limitQuery, req.GetOffset())
+	var favoritedBy *model.User
+	if req.GetFavorited() != "" {
+		var err error
+		favoritedBy, err = h.us.GetByUsername(req.GetFavorited())
+		if err != nil {
+			h.logger.Error().Err(err).Msg("failed to get user for favorited query")
+			return nil, status.Error(codes.InvalidArgument, "invalid favorited query")
+		}
+	}
+
+	as, err := h.as.GetArticles(req.GetTag(), req.GetAuthor(), favoritedBy, limitQuery, req.GetOffset())
 	if err != nil {
 		h.logger.Error().Err(err).Msg("failed to search articles in the database")
 		return nil, status.Error(codes.Aborted, "internal server error")
@@ -154,7 +167,12 @@ func (h *Handler) GetArticles(ctx context.Context, req *pb.GetArticlesRequest) (
 	pas := make([]*pb.Article, 0, len(as))
 	for _, a := range as {
 		// get whether the article is current user's favorite
-		favorited := false
+		favorited, err := h.as.IsFavorited(&a, currentUser)
+		if err != nil {
+			msg := "failed to get favorited status"
+			h.logger.Error().Err(err).Msg(msg)
+			return nil, status.Error(codes.Aborted, "internal server error")
+		}
 		pa := a.ProtoArticle(favorited)
 
 		// get whether current user follows article author
@@ -210,7 +228,12 @@ func (h *Handler) GetFeedArticles(ctx context.Context, req *pb.GetFeedArticlesRe
 	pas := make([]*pb.Article, 0, len(as))
 	for _, a := range as {
 		// get whether the article is current user's favorite
-		favorited := false
+		favorited, err := h.as.IsFavorited(&a, currentUser)
+		if err != nil {
+			msg := "failed to get favorited status"
+			h.logger.Error().Err(err).Msg(msg)
+			return nil, status.Error(codes.Aborted, "internal server error")
+		}
 		pa := a.ProtoArticle(favorited)
 
 		// get whether current user follows article author
@@ -259,7 +282,6 @@ func (h *Handler) UpdateArticle(ctx context.Context, req *pb.UpdateArticleReques
 	if err != nil {
 		msg := fmt.Sprintf("requested article (slug=%d) not found", articleID)
 		h.logger.Error().Err(err).Msg(msg)
-		pp.Println(err)
 		return nil, status.Error(codes.InvalidArgument, "invalid article id")
 	}
 
@@ -335,7 +357,6 @@ func (h *Handler) DeleteArticle(ctx context.Context, req *pb.DeleteArticleReques
 	if err != nil {
 		msg := fmt.Sprintf("requested article (slug=%d) not found", articleID)
 		h.logger.Error().Err(err).Msg(msg)
-		pp.Println(err)
 		return nil, status.Error(codes.InvalidArgument, "invalid article id")
 	}
 
@@ -386,14 +407,12 @@ func (h *Handler) FavoriteArticle(ctx context.Context, req *pb.FavoriteArticleRe
 	if err != nil {
 		msg := fmt.Sprintf("requested article (slug=%d) not found", articleID)
 		h.logger.Error().Err(err).Msg(msg)
-		pp.Println(err)
 		return nil, status.Error(codes.InvalidArgument, "invalid article id")
 	}
 
 	err = h.as.AddFavorite(article, currentUser)
 	if err != nil {
 		h.logger.Error().Err(err).Msg("failed to add favorite")
-		pp.Println(err)
 		return nil, status.Error(codes.Aborted, "internal server error")
 	}
 

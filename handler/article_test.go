@@ -130,6 +130,10 @@ func TestGetArticle(t *testing.T) {
 		}
 	}
 
+	if err := h.as.AddFavorite(&awesomeArticle, &barUser); err != nil {
+		t.Fatalf("failed to create initial favorite articles: %v", err)
+	}
+
 	tests := []struct {
 		title     string
 		reqUser   *model.User
@@ -154,7 +158,7 @@ func TestGetArticle(t *testing.T) {
 			&pb.GetArticleRequest{
 				Slug: fmt.Sprintf("%d", awesomeArticle.ID),
 			},
-			false,
+			true,
 			true,
 			false,
 		},
@@ -197,7 +201,7 @@ func TestGetArticle(t *testing.T) {
 		}
 		assert.ElementsMatch(t, tags, got.GetTagList())
 		assert.Equal(t, tt.favorited, got.GetFavorited())
-		assert.Equal(t, int64(0), got.GetFavoritesCount())
+		assert.Equal(t, int64(1), got.GetFavoritesCount())
 
 		author := got.GetAuthor()
 		assert.Equal(t, fooUser.Username, author.GetUsername())
@@ -255,9 +259,14 @@ func TestGetArticles(t *testing.T) {
 		articles[10-i-1] = &a
 	}
 
-	for _, a := range articles {
+	for i, a := range articles {
 		if err := h.as.Create(a); err != nil {
 			t.Fatalf("failed to create initial article record: %v", err)
+		}
+		if i < 5 {
+			if err := h.as.AddFavorite(a, &fooUser); err != nil {
+				t.Fatalf("failed to create initial favorite articles: %v", err)
+			}
 		}
 	}
 
@@ -327,6 +336,18 @@ func TestGetArticles(t *testing.T) {
 			articles[6:8],
 			false,
 		},
+		{
+			"get articles with favorite query",
+			&pb.GetArticlesRequest{
+				Tag:       "",
+				Author:    "",
+				Favorited: "foo",
+				Limit:     0,
+				Offset:    0,
+			},
+			articles[0:5],
+			false,
+		},
 	}
 
 	for _, tt := range tests {
@@ -355,8 +376,8 @@ func TestGetArticles(t *testing.T) {
 			got := resp.GetArticles()[i]
 			expected := tt.expected[i]
 
-			assert.Equal(t, expected.Title, got.GetTitle())
-			assert.Equal(t, expected.Author.Username, got.GetAuthor().GetUsername())
+			assert.Equal(t, expected.Title, got.GetTitle(), tt.title)
+			assert.Equal(t, expected.Author.Username, got.GetAuthor().GetUsername(), tt.title)
 		}
 	}
 }
