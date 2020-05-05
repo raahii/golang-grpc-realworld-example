@@ -513,3 +513,91 @@ func TestUpdateArticle(t *testing.T) {
 		assert.Equal(t, expAuthor.GetFollowing(), gotAuthor.GetFollowing())
 	}
 }
+
+func TestDeleteArticle(t *testing.T) {
+	h, cleaner := setUp(t)
+	defer cleaner(t)
+
+	fooUser := model.User{
+		Username: "foo",
+		Email:    "foo@example.com",
+		Password: "secret",
+	}
+
+	barUser := model.User{
+		Username: "bar",
+		Email:    "bar@example.com",
+		Password: "secret",
+	}
+
+	for _, u := range []*model.User{&fooUser} {
+		if err := h.us.Create(u); err != nil {
+			t.Fatalf("failed to create initial user record: %v", err)
+		}
+	}
+
+	af := model.Article{
+		Title:       "original title",
+		Description: "original desc",
+		Body:        "original body",
+		Author:      fooUser,
+		Tags:        []model.Tag{model.Tag{Name: "hoge"}},
+	}
+
+	ab := model.Article{
+		Title:       "original title",
+		Description: "original desc",
+		Body:        "original body",
+		Author:      barUser,
+		Tags:        []model.Tag{model.Tag{Name: "hoge"}},
+	}
+
+	for _, a := range []*model.Article{&af, &ab} {
+		if err := h.as.Create(a); err != nil {
+			t.Fatalf("failed to create initial article record: %v", err)
+		}
+	}
+
+	tests := []struct {
+		title    string
+		req      *pb.DeleteArticleRequest
+		hasError bool
+	}{
+		{
+			"delete article: success",
+			&pb.DeleteArticleRequest{
+				Slug: fmt.Sprintf("%d", af.ID),
+			},
+			false,
+		},
+		{
+			"delete other user's article: forbidden",
+			&pb.DeleteArticleRequest{
+				Slug: fmt.Sprintf("%d", ab.ID),
+			},
+			true,
+		},
+	}
+
+	for _, tt := range tests {
+		token, err := auth.GenerateToken(fooUser.ID)
+		if err != nil {
+			t.Error(err)
+		}
+
+		ctx := ctxWithToken(context.Background(), token)
+		_, err = h.DeleteArticle(ctx, tt.req)
+		if tt.hasError {
+			if err == nil {
+				t.Errorf("%q expected to fail, but succeeded.", tt.title)
+				t.FailNow()
+			}
+			continue
+		}
+
+		if !tt.hasError && err != nil {
+			t.Errorf("%q expected to succeed, but failed. %v", tt.title, err)
+			t.FailNow()
+		}
+	}
+}

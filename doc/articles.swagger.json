@@ -145,10 +145,41 @@
         "tags": [
           "Articles"
         ]
+      },
+      "delete": {
+        "operationId": "DeleteArticle",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/emptyEmpty"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Articles"
+        ]
       }
     }
   },
   "definitions": {
+    "emptyEmpty": {
+      "type": "object"
+    },
     "profileArticle": {
       "type": "object",
       "properties": {

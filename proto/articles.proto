@@ -7,6 +7,7 @@ option go_package = ".;proto";
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
 import "profiles.proto";
+import "empty.proto";
 
 message Article {
   string slug = 1;
@@ -43,6 +44,11 @@ service Articles {
       put: "/articles/{article.slug}"
     };
   }
+  rpc DeleteArticle (DeleteArticleRequest) returns (empty.Empty) {
+    option (google.api.http) = {
+      delete: "/articles/{slug}"
+    };
+  }
 }
 
 message CreateAritcleRequest {
@@ -76,6 +82,10 @@ message UpdateArticleRequest {
     string slug = 4;
   }
   Article article = 1;
+}
+
+message DeleteArticleRequest {
+  string slug = 1;
 }
 
 message ArticleResponse {

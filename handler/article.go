@@ -249,3 +249,8 @@ func (h *Handler) UpdateArticle(ctx context.Context, req *pb.UpdateArticleReques
 
 	return &pb.ArticleResponse{Article: pa}, nil
 }
+
+// DeleteArticle deletes an article
+func (h *Handler) DeleteArticle(ctx context.Context, req *pb.DeleteArticleRequest) (*pb.Empty, error) {
+	return &pb.Empty{}, nil
+}
