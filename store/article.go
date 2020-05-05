@@ -65,3 +65,8 @@ func (s *ArticleStore) GetArticles(tagName, username string, limit, offset int64
 
 	return as, err
 }
+
+// Delete deletes an article
+func (s *ArticleStore) Delete(m *model.Article) error {
+	return s.db.Delete(m).Error
+}

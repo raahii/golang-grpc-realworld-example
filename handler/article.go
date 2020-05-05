@@ -176,7 +176,7 @@ func (h *Handler) GetArticles(ctx context.Context, req *pb.GetArticlesRequest) (
 
 // UpdateArticle updates an article
 func (h *Handler) UpdateArticle(ctx context.Context, req *pb.UpdateArticleRequest) (*pb.ArticleResponse, error) {
-	h.logger.Info().Msgf("Update artciles | req: %+v\n", req)
+	h.logger.Info().Msgf("Update artcile | req: %+v\n", req)
 
 	userID, err := auth.GetUserID(ctx)
 	if err != nil {
@@ -252,5 +252,51 @@ func (h *Handler) UpdateArticle(ctx context.Context, req *pb.UpdateArticleReques
 
 // DeleteArticle deletes an article
 func (h *Handler) DeleteArticle(ctx context.Context, req *pb.DeleteArticleRequest) (*pb.Empty, error) {
+	h.logger.Info().Msgf("Delete artcile | req: %+v\n", req)
+
+	userID, err := auth.GetUserID(ctx)
+	if err != nil {
+		msg := "unauthenticated"
+		h.logger.Error().Err(err).Msg(msg)
+		return nil, status.Errorf(codes.Unauthenticated, msg)
+	}
+
+	currentUser, err := h.us.GetByID(userID)
+	if err != nil {
+		msg := "not user found"
+		err = fmt.Errorf("token is valid but the user not found: %w", err)
+		h.logger.Error().Err(err).Msg(msg)
+		return nil, status.Error(codes.NotFound, msg)
+	}
+
+	slug := req.GetSlug()
+	articleID, err := strconv.Atoi(slug)
+	if err != nil {
+		msg := fmt.Sprintf("cannot convert slug (%s) into integer", slug)
+		h.logger.Error().Err(err).Msg(msg)
+		return nil, status.Error(codes.InvalidArgument, "invalid article id")
+	}
+
+	article, err := h.as.GetByID(uint(articleID))
+	if err != nil {
+		msg := fmt.Sprintf("requested article (slug=%d) not found", articleID)
+		h.logger.Error().Err(err).Msg(msg)
+		pp.Println(err)
+		return nil, status.Error(codes.InvalidArgument, "invalid article id")
+	}
+
+	if article.Author.ID != currentUser.ID {
+		msg := fmt.Sprintf("user(id=%d) attempted to update other user's article(id=%d)",
+			currentUser.ID, article.ID)
+		h.logger.Error().Err(err).Msg(msg)
+		return nil, status.Errorf(codes.Unauthenticated, "forbidden")
+	}
+
+	if err := h.as.Delete(article); err != nil {
+		msg := "failed to delete article"
+		h.logger.Error().Err(err).Msg(msg)
+		return nil, status.Errorf(codes.Unauthenticated, msg)
+	}
+
 	return &pb.Empty{}, nil
 }
