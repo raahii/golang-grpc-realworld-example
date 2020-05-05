@@ -9,6 +9,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
 	"github.com/raahii/golang-grpc-realworld-example/db"
+	"github.com/raahii/golang-grpc-realworld-example/store"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc/metadata"
 )
@@ -23,7 +24,9 @@ func setUp(t *testing.T) (*Handler, func(t *testing.T)) {
 		t.Fatal(fmt.Errorf("failed to initialize database: %w", err))
 	}
 
-	return New(&l, d), func(t *testing.T) {
+	us := store.NewUserStore(d)
+
+	return New(&l, d, us), func(t *testing.T) {
 		err := db.DropTestDB(d)
 		if err != nil {
 			t.Fatal(fmt.Errorf("failed to clean database: %w", err))

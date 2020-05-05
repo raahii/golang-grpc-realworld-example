@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/raahii/golang-grpc-realworld-example/auth"
-	"github.com/raahii/golang-grpc-realworld-example/model"
 	pb "github.com/raahii/golang-grpc-realworld-example/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -21,32 +20,30 @@ func (h *Handler) ShowProfile(ctx context.Context, req *pb.ShowProfileRequest) (
 		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
-	var currentUser model.User
-	err = h.db.Find(&currentUser, userID).Error
+	currentUser, err := h.us.GetByID(userID)
 	if err != nil {
-		h.logger.Fatal().Err(err).Msg("current user not found")
+		h.logger.Error().Err(err).Msg("current user not found")
 		return nil, status.Error(codes.NotFound, "user not found")
 	}
 
-	var u model.User
-	err = h.db.Where("username = ?", req.Username).First(&u).Error
+	requestUser, err := h.us.GetByUsername(req.GetUsername())
 	if err != nil {
-		h.logger.Fatal().Err(fmt.Errorf("user not found: %w", err))
-		return nil, status.Error(codes.NotFound, "user was not found")
+		msg := "user was not found"
+		h.logger.Error().Err(err).Msg(msg)
+		return nil, status.Error(codes.NotFound, msg)
 	}
 
-	var count int
-	err = h.db.Table("follows").Where("from_user_id = ? AND to_user_id = ?", currentUser.ID, u.ID).Count(&count).Error
+	following, err := h.us.IsFollowing(currentUser, requestUser)
 	if err != nil {
-		h.logger.Fatal().Err(err).Msg("failed to find following relationship")
-		return nil, status.Error(codes.Aborted, "internal server error")
+		msg := "failed to get following status"
+		h.logger.Error().Err(err).Msg(msg)
+		return nil, status.Error(codes.NotFound, "internal server error")
 	}
-	following := count >= 1
 
 	p := pb.Profile{
-		Username:  u.Username,
-		Bio:       u.Bio,
-		Image:     u.Image,
+		Username:  requestUser.Username,
+		Bio:       requestUser.Bio,
+		Image:     requestUser.Image,
 		Following: following,
 	}
 
@@ -64,35 +61,35 @@ func (h *Handler) FollowUser(ctx context.Context, req *pb.FollowRequest) (*pb.Pr
 		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
-	var currentUser model.User
-	err = h.db.Find(&currentUser, userID).Error
+	currentUser, err := h.us.GetByID(userID)
 	if err != nil {
-		h.logger.Fatal().Err(err).Msg("current user not found")
+		h.logger.Error().Err(err).Msg("current user not found")
 		return nil, status.Error(codes.NotFound, "user not found")
 	}
 
-	if currentUser.Username == req.Username {
+	if currentUser.Username == req.GetUsername() {
 		h.logger.Error().Msg("cannot follow yourself")
 		return nil, status.Error(codes.InvalidArgument, "cannot follow yourself")
 	}
 
-	var u model.User
-	err = h.db.Where("username = ?", req.Username).First(&u).Error
+	requestUser, err := h.us.GetByUsername(req.GetUsername())
 	if err != nil {
-		h.logger.Fatal().Err(err).Msg("target user not found")
+		h.logger.Error().Err(fmt.Errorf("user not found: %w", err))
 		return nil, status.Error(codes.NotFound, "user was not found")
 	}
 
-	err = h.db.Model(&currentUser).Association("Follows").Append(&u).Error
+	err = h.us.Follow(currentUser, requestUser)
 	if err != nil {
-		h.logger.Fatal().Err(err).Msgf("failed to follow user: (ID: %d) -> (ID: %d)", currentUser.ID, u.ID)
+		msg := fmt.Sprintf("failed to follow user: (ID: %d) -> (ID: %d)",
+			currentUser.ID, requestUser.ID)
+		h.logger.Error().Err(err).Msg(msg)
 		return nil, status.Error(codes.Aborted, "failed to follow user")
 	}
 
 	p := pb.Profile{
-		Username:  u.Username,
-		Bio:       u.Bio,
-		Image:     u.Image,
+		Username:  requestUser.Username,
+		Bio:       requestUser.Bio,
+		Image:     requestUser.Image,
 		Following: true,
 	}
 
@@ -110,48 +107,48 @@ func (h *Handler) UnfollowUser(ctx context.Context, req *pb.UnfollowRequest) (*p
 		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
-	var currentUser model.User
-	err = h.db.Find(&currentUser, userID).Error
+	currentUser, err := h.us.GetByID(userID)
 	if err != nil {
-		h.logger.Fatal().Err(err).Msg("current user not found")
+		h.logger.Error().Err(err).Msg("current user not found")
 		return nil, status.Error(codes.NotFound, "user not found")
 	}
 
-	if currentUser.Username == req.Username {
-		h.logger.Error().Msg("cannot unfollow yourself")
+	if currentUser.Username == req.GetUsername() {
+		h.logger.Error().Msg("cannot follow yourself")
 		return nil, status.Error(codes.InvalidArgument, "cannot follow yourself")
 	}
 
-	var u model.User
-	err = h.db.Where("username = ?", req.Username).First(&u).Error
+	requestUser, err := h.us.GetByUsername(req.GetUsername())
 	if err != nil {
-		h.logger.Fatal().Err(err).Msg("target user not found")
-		return nil, status.Error(codes.NotFound, "user was not found")
+		msg := "user was not found"
+		h.logger.Error().Err(err).Msg(msg)
+		return nil, status.Error(codes.NotFound, msg)
 	}
 
-	var count int
-	err = h.db.Table("follows").Where("from_user_id = ? AND to_user_id = ?", currentUser.ID, u.ID).Count(&count).Error
+	following, err := h.us.IsFollowing(currentUser, requestUser)
 	if err != nil {
-		h.logger.Fatal().Err(err).Msg("failed to find following relationship")
-		return nil, status.Error(codes.Aborted, "internal server error")
+		msg := "failed to get following status"
+		h.logger.Error().Err(err).Msg(msg)
+		return nil, status.Error(codes.NotFound, "internal server error")
 	}
-	following := count >= 1
 
 	if !following {
-		h.logger.Error().Err(err).Msg("requested user is not following")
-		return nil, status.Errorf(codes.Unauthenticated, "requested user is not following")
+		h.logger.Error().Err(err).Msg("current user is not following request user")
+		return nil, status.Errorf(codes.Unauthenticated, "you are not following the user")
 	}
 
-	err = h.db.Model(&currentUser).Association("Follows").Delete(&u).Error
+	err = h.us.Unfollow(currentUser, requestUser)
 	if err != nil {
-		h.logger.Fatal().Err(err).Msgf("failed to unfollow user: (ID: %d) -> (ID: %d)", currentUser.ID, u.ID)
+		msg := fmt.Sprintf("failed to unfollow user: (ID: %d) -> (ID: %d)",
+			currentUser.ID, requestUser.ID)
+		h.logger.Error().Err(err).Msg(msg)
 		return nil, status.Error(codes.Aborted, "failed to unfollow user")
 	}
 
 	p := pb.Profile{
-		Username:  u.Username,
-		Bio:       u.Bio,
-		Image:     u.Image,
+		Username:  requestUser.Username,
+		Bio:       requestUser.Bio,
+		Image:     requestUser.Image,
 		Following: false,
 	}
 

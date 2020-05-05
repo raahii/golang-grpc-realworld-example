@@ -3,7 +3,6 @@ package handler
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/raahii/golang-grpc-realworld-example/auth"
@@ -17,8 +16,7 @@ import (
 func (h *Handler) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (*pb.UserResponse, error) {
 	h.logger.Info().Msg("login user")
 
-	u := model.User{}
-	err := h.db.Where("email = ?", req.User.GetEmail()).First(&u).Error
+	u, err := h.us.GetByEmail(req.GetUser().GetEmail())
 	if err != nil {
 		msg := "invalid email or password"
 		err = fmt.Errorf("failed to login due to wrong email: %w", err)
@@ -26,7 +24,7 @@ func (h *Handler) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (*pb.
 		return nil, status.Error(codes.InvalidArgument, msg)
 	}
 
-	if !u.CheckPassword(req.User.GetPassword()) {
+	if !u.CheckPassword(req.GetUser().GetPassword()) {
 		h.logger.Error().Msgf("failed to login due to receive wrong password: %s", u.Email)
 		return nil, status.Error(codes.InvalidArgument, "invalid email or password")
 	}
@@ -76,7 +74,7 @@ func (h *Handler) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*p
 		return nil, status.Error(codes.Aborted, err.Error())
 	}
 
-	err = h.db.Create(&u).Error
+	err = h.us.Create(&u)
 	if err != nil {
 		msg := "internal server error"
 		err := fmt.Errorf("Failed to create user. %w", err)
@@ -114,8 +112,7 @@ func (h *Handler) CurrentUser(ctx context.Context, req *empty.Empty) (*pb.UserRe
 		return nil, status.Errorf(codes.Unauthenticated, msg)
 	}
 
-	u := model.User{}
-	err = h.db.Where("id = ?", userID).First(&u).Error
+	u, err := h.us.GetByID(userID)
 	if err != nil {
 		msg := "user not found"
 		err = fmt.Errorf("token is valid but the user not found: %w", err)
@@ -153,8 +150,7 @@ func (h *Handler) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*p
 		return nil, status.Errorf(codes.Unauthenticated, msg)
 	}
 
-	u := model.User{}
-	err = h.db.First(&u, userID).Error
+	u, err := h.us.GetByID(userID)
 	if err != nil {
 		msg := "not user found"
 		err = fmt.Errorf("token is valid but the user not found: %w", err)
@@ -206,8 +202,7 @@ func (h *Handler) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*p
 		}
 	}
 
-	u.UpdatedAt = time.Now()
-	err = h.db.Model(&u).Update(&u).Error
+	err = h.us.Update(u)
 	if err != nil {
 		msg := "internal server error"
 		err = fmt.Errorf("failed to update user: %w", err)

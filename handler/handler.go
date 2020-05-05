@@ -5,6 +5,7 @@ import (
 
 	"github.com/jinzhu/gorm"
 	pb "github.com/raahii/golang-grpc-realworld-example/proto"
+	"github.com/raahii/golang-grpc-realworld-example/store"
 	"github.com/rs/zerolog"
 )
 
@@ -12,11 +13,12 @@ import (
 type Handler struct {
 	logger *zerolog.Logger
 	db     *gorm.DB
+	us     *store.UserStore
 }
 
 // New returns a new handler with logger and database
-func New(l *zerolog.Logger, d *gorm.DB) *Handler {
-	return &Handler{logger: l, db: d}
+func New(l *zerolog.Logger, d *gorm.DB, us *store.UserStore) *Handler {
+	return &Handler{logger: l, db: d, us: us}
 }
 
 // SayHello is a dummy method

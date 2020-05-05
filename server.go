@@ -9,6 +9,7 @@ import (
 	"github.com/raahii/golang-grpc-realworld-example/db"
 	"github.com/raahii/golang-grpc-realworld-example/handler"
 	pb "github.com/raahii/golang-grpc-realworld-example/proto"
+	"github.com/raahii/golang-grpc-realworld-example/store"
 	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
 )
@@ -25,17 +26,17 @@ func main() {
 	if err != nil {
 		err = fmt.Errorf("failed to connect database: %w", err)
 		l.Fatal().Err(err).Msg("failed to connect the database")
-		os.Exit(1)
 	}
 	l.Info().Msg("success to connect to the database")
 
 	err = db.AutoMigrate(d)
 	if err != nil {
 		l.Fatal().Err(err).Msg("failed to migrate database")
-		os.Exit(1)
 	}
 
-	h := handler.New(&l, d)
+	us := store.NewUserStore(d)
+
+	h := handler.New(&l, d, us)
 
 	lis, err := net.Listen("tcp", port)
 	if err != nil {

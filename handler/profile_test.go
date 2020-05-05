@@ -20,7 +20,7 @@ func TestShowProfile(t *testing.T) {
 		Password: "secret",
 	}
 
-	if err := h.db.Create(&fooUser).Error; err != nil {
+	if err := h.us.Create(&fooUser); err != nil {
 		t.Fatalf("failed to create initial user record: %v", err)
 	}
 

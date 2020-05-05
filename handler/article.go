@@ -23,10 +23,9 @@ func (h *Handler) CreateArticle(ctx context.Context, req *pb.CreateAritcleReques
 		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
 	}
 
-	var currentUser model.User
-	err = h.db.Find(&currentUser, userID).Error
+	currentUser, err := h.us.GetByID(userID)
 	if err != nil {
-		h.logger.Fatal().Err(err).Msg("current user not found")
+		h.logger.Error().Err(err).Msg("current user not found")
 		return nil, status.Error(codes.NotFound, "user not found")
 	}
 
@@ -40,7 +39,7 @@ func (h *Handler) CreateArticle(ctx context.Context, req *pb.CreateAritcleReques
 		Title:       ra.GetTitle(),
 		Description: ra.GetDescription(),
 		Body:        ra.GetBody(),
-		Author:      currentUser,
+		Author:      *currentUser,
 		Tags:        tags,
 	}
 
@@ -59,7 +58,7 @@ func (h *Handler) CreateArticle(ctx context.Context, req *pb.CreateAritcleReques
 	}
 
 	var pa pb.Article
-	err = a.BindTo(&pa, &currentUser, h.db)
+	err = a.BindTo(&pa, currentUser, h.db)
 	if err != nil {
 		msg := "Failed to convert model.User to pb.User"
 		h.logger.Error().Err(err).Msg(msg)
@@ -93,14 +92,12 @@ func (h *Handler) GetArticle(ctx context.Context, req *pb.GetArticleRequest) (*p
 	// get current user if exists
 	userID, err := auth.GetUserID(ctx)
 	if err == nil {
-		var u model.User
-		err = h.db.Find(&u, userID).Error
+		currentUser, err = h.us.GetByID(userID)
 		if err != nil {
 			msg := fmt.Sprintf("token is valid but the user not found")
 			h.logger.Error().Err(err).Msg(msg)
 			return nil, status.Error(codes.NotFound, msg)
 		}
-		currentUser = &u
 	}
 
 	// bind article
