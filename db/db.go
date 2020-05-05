@@ -83,7 +83,7 @@ func New() (*gorm.DB, error) {
 
 // NewTestDB return mysql connection wrapped txdb
 func NewTestDB() (*gorm.DB, error) {
-	err := godotenv.Load("../env/local.env")
+	err := godotenv.Load("../env/test.env")
 	if err != nil {
 		return nil, err
 	}
