@@ -145,7 +145,7 @@ func TestLoginUser(t *testing.T) {
 		t.Fatal("Failed to hash password")
 	}
 
-	if err := h.db.Create(&fooUser).Error; err != nil {
+	if err := h.us.Create(&fooUser); err != nil {
 		t.Fatalf("failed to create initial user record: %v", err)
 	}
 
@@ -233,7 +233,7 @@ func TestCurrentUser(t *testing.T) {
 		t.Fatal("failed to hash password")
 	}
 
-	if err := h.db.Create(&fooUser).Error; err != nil {
+	if err := h.us.Create(&fooUser); err != nil {
 		t.Fatalf("failed to create initial user record: %v", err)
 	}
 
@@ -306,7 +306,7 @@ func TestUpdateUser(t *testing.T) {
 			t.Fatal("failed to hash password")
 		}
 
-		if err := h.db.Create(u).Error; err != nil {
+		if err := h.us.Create(u); err != nil {
 			t.Fatalf("failed to create initial user record: %v", err)
 		}
 	}

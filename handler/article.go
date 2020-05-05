@@ -97,19 +97,17 @@ func (h *Handler) GetArticle(ctx context.Context, req *pb.GetArticleRequest) (*p
 
 	// get current user if exists
 	userID, err := auth.GetUserID(ctx)
-	if err == nil {
-		currentUser, err = h.us.GetByID(userID)
-		if err != nil {
-			msg := fmt.Sprintf("token is valid but the user not found")
-			h.logger.Error().Err(err).Msg(msg)
-			return nil, status.Error(codes.NotFound, msg)
-		}
-	}
-
-	if currentUser == nil {
+	if err != nil {
 		pa := article.ProtoArticle(false)
 		pa.Author = article.Author.ProtoProfile(false)
 		return &pb.ArticleResponse{Article: pa}, nil
+	}
+
+	currentUser, err = h.us.GetByID(userID)
+	if err != nil {
+		msg := fmt.Sprintf("token is valid but the user not found")
+		h.logger.Error().Err(err).Msg(msg)
+		return nil, status.Error(codes.NotFound, msg)
 	}
 
 	// get whether the article is current user's favorite

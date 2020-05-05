@@ -37,7 +37,7 @@ func main() {
 	us := store.NewUserStore(d)
 	as := store.NewArticleStore(d)
 
-	h := handler.New(&l, d, us, as)
+	h := handler.New(&l, us, as)
 
 	lis, err := net.Listen("tcp", port)
 	if err != nil {

@@ -23,7 +23,7 @@ func TestCreateArticle(t *testing.T) {
 	}
 
 	for _, u := range []*model.User{&fooUser} {
-		if err := h.db.Create(u).Error; err != nil {
+		if err := h.us.Create(u); err != nil {
 			t.Fatalf("failed to create initial user record: %v", err)
 		}
 	}
@@ -105,32 +105,27 @@ func TestGetArticle(t *testing.T) {
 		Password: "secret",
 	}
 
-	for _, u := range []*model.User{&fooUser, &barUser} {
-		if err := h.db.Create(u).Error; err != nil {
+	for _, u := range []*model.User{&barUser, &fooUser} {
+		if err := h.us.Create(u); err != nil {
 			t.Fatalf("failed to create initial user record: %v", err)
 		}
 	}
 
-	err := h.db.Model(&barUser).Association("Follows").Append(&fooUser).Error
+	err := h.us.Follow(&barUser, &fooUser)
 	if err != nil {
 		t.Fatalf("failed to create initial user relationship: %v", err)
-	}
-
-	tag := model.Tag{Name: "hoge"}
-	if err := h.db.Create(&tag).Error; err != nil {
-		t.Fatalf("failed to create initial tag record: %v", err)
 	}
 
 	awesomeArticle := model.Article{
 		Title:       "awesome post!",
 		Description: "awesome description!",
 		Body:        "awesome content!",
-		Tags:        []model.Tag{tag},
+		Tags:        []model.Tag{model.Tag{Name: "hoge"}},
 		Author:      fooUser,
 	}
 
 	for _, a := range []*model.Article{&awesomeArticle} {
-		if err := h.db.Create(a).Error; err != nil {
+		if err := h.as.Create(a); err != nil {
 			t.Fatalf("failed to create initial article record: %v", err)
 		}
 	}
@@ -235,15 +230,12 @@ func TestGetArticles(t *testing.T) {
 	}
 
 	for _, u := range []*model.User{&fooUser, &barUser, &reqUser} {
-		if err := h.db.Create(u).Error; err != nil {
+		if err := h.us.Create(u); err != nil {
 			t.Fatalf("failed to create initial user record: %v", err)
 		}
 	}
 
 	tag := model.Tag{Name: "hoge"}
-	if err := h.db.Create(&tag).Error; err != nil {
-		t.Fatalf("failed to create initial tag record: %v", err)
-	}
 
 	articles := make([]*model.Article, 10)
 	for i := 0; i < 10; i++ {
@@ -264,7 +256,7 @@ func TestGetArticles(t *testing.T) {
 	}
 
 	for _, a := range articles {
-		if err := h.db.Create(a).Error; err != nil {
+		if err := h.as.Create(a); err != nil {
 			t.Fatalf("failed to create initial article record: %v", err)
 		}
 	}

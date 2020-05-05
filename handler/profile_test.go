@@ -20,8 +20,19 @@ func TestShowProfile(t *testing.T) {
 		Password: "secret",
 	}
 
+	barUser := model.User{
+		Username: "bar",
+		Email:    "bar@example.com",
+		Password: "secret",
+	}
+
 	if err := h.us.Create(&fooUser); err != nil {
 		t.Fatalf("failed to create initial user record: %v", err)
+	}
+
+	err := h.us.Follow(&fooUser, &barUser)
+	if err != nil {
+		t.Fatalf("failed to create initial user follow relationship: %v", err)
 	}
 
 	tests := []struct {
@@ -40,6 +51,19 @@ func TestShowProfile(t *testing.T) {
 				Bio:       fooUser.Bio,
 				Image:     fooUser.Image,
 				Following: false,
+			},
+			false,
+		},
+		{
+			"show following user: success",
+			&pb.ShowProfileRequest{
+				Username: barUser.Username,
+			},
+			&pb.Profile{
+				Username:  barUser.Username,
+				Bio:       barUser.Bio,
+				Image:     barUser.Image,
+				Following: true,
 			},
 			false,
 		},
@@ -99,7 +123,7 @@ func TestFollowUser(t *testing.T) {
 	}
 
 	for _, u := range []*model.User{&fooUser, &barUser} {
-		if err := h.db.Create(u).Error; err != nil {
+		if err := h.us.Create(u); err != nil {
 			t.Fatalf("failed to create initial user record: %v", err)
 		}
 	}
@@ -179,14 +203,14 @@ func TestUnfollowUser(t *testing.T) {
 	}
 
 	for _, u := range []*model.User{&fooUser, &barUser} {
-		if err := h.db.Create(u).Error; err != nil {
+		if err := h.us.Create(u); err != nil {
 			t.Fatalf("failed to create initial user record: %v", err)
 		}
 	}
 
-	err := h.db.Model(&fooUser).Association("Follows").Append(&barUser).Error
+	err := h.us.Follow(&fooUser, &barUser)
 	if err != nil {
-		t.Fatalf("failed to create initial following relationship: %v", err)
+		t.Fatalf("failed to create initial user relationship: %v", err)
 	}
 
 	tests := []struct {
@@ -196,7 +220,7 @@ func TestUnfollowUser(t *testing.T) {
 		hasError bool
 	}{
 		{
-			"fooUser follows barUser: success",
+			"fooUser unfollows barUser: success",
 			&pb.UnfollowRequest{
 				Username: barUser.Username,
 			},
@@ -209,7 +233,7 @@ func TestUnfollowUser(t *testing.T) {
 			false,
 		},
 		{
-			"fooUser follows fooUser: cannnot unfollow myself",
+			"fooUser unfollows fooUser: cannnot unfollow myself",
 			&pb.UnfollowRequest{
 				Username: fooUser.Username,
 			},
