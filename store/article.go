@@ -66,6 +66,20 @@ func (s *ArticleStore) GetArticles(tagName, username string, limit, offset int64
 	return as, err
 }
 
+// GetFeedArticles returns following users' articles
+func (s *ArticleStore) GetFeedArticles(userIDs []uint, limit, offset int64) ([]model.Article, error) {
+	d := s.db.Preload("Author").
+		Where("user_id in (?)", userIDs)
+
+	// offset query, limit query
+	d = d.Offset(offset).Limit(limit)
+
+	var as []model.Article
+	err := d.Find(&as).Error
+
+	return as, err
+}
+
 // Delete deletes an article
 func (s *ArticleStore) Delete(m *model.Article) error {
 	return s.db.Delete(m).Error

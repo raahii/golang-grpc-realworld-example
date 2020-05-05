@@ -93,8 +93,6 @@ func (h *Handler) GetArticle(ctx context.Context, req *pb.GetArticleRequest) (*p
 		return nil, status.Error(codes.InvalidArgument, "invalid article id")
 	}
 
-	var currentUser *model.User
-
 	// get current user if exists
 	userID, err := auth.GetUserID(ctx)
 	if err != nil {
@@ -103,7 +101,7 @@ func (h *Handler) GetArticle(ctx context.Context, req *pb.GetArticleRequest) (*p
 		return &pb.ArticleResponse{Article: pa}, nil
 	}
 
-	currentUser, err = h.us.GetByID(userID)
+	currentUser, err := h.us.GetByID(userID)
 	if err != nil {
 		msg := fmt.Sprintf("token is valid but the user not found")
 		h.logger.Error().Err(err).Msg(msg)
@@ -177,7 +175,57 @@ func (h *Handler) GetArticles(ctx context.Context, req *pb.GetArticlesRequest) (
 // GetFeedArticles gets recent articles from users current user follow
 func (h *Handler) GetFeedArticles(ctx context.Context, req *pb.GetFeedArticlesRequest) (*pb.ArticlesResponse, error) {
 	h.logger.Info().Msgf("Get feed article | req: %+v\n", req)
-	return &pb.ArticlesResponse{}, nil
+
+	userID, err := auth.GetUserID(ctx)
+	if err != nil {
+		h.logger.Error().Err(err).Msg("unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
+	}
+
+	currentUser, err := h.us.GetByID(userID)
+	if err != nil {
+		h.logger.Error().Err(err).Msg("current user not found")
+		return nil, status.Error(codes.NotFound, "user not found")
+	}
+
+	userIDs, err := h.us.GetFollowingUserIDs(currentUser)
+	if err != nil {
+		msg := fmt.Sprintf("failed to get following user ids of user %d", currentUser.ID)
+		h.logger.Error().Err(err).Msg(msg)
+		return nil, status.Error(codes.NotFound, "internal server error")
+	}
+
+	limitQuery := req.GetLimit()
+	if limitQuery == 0 {
+		limitQuery = 20
+	}
+
+	as, err := h.as.GetFeedArticles(userIDs, limitQuery, req.GetOffset())
+	if err != nil {
+		msg := "failed to get articles by user ids"
+		h.logger.Error().Err(err).Msg(msg)
+		return nil, status.Error(codes.NotFound, "internal server error")
+	}
+
+	pas := make([]*pb.Article, 0, len(as))
+	for _, a := range as {
+		// get whether the article is current user's favorite
+		favorited := false
+		pa := a.ProtoArticle(favorited)
+
+		// get whether current user follows article author
+		following, err := h.us.IsFollowing(currentUser, &a.Author)
+		if err != nil {
+			msg := "failed to get following status"
+			h.logger.Error().Err(err).Msg(msg)
+			return nil, status.Error(codes.NotFound, "internal server error")
+		}
+		pa.Author = a.Author.ProtoProfile(following)
+
+		pas = append(pas, pa)
+	}
+
+	return &pb.ArticlesResponse{Articles: pas}, nil
 }
 
 // UpdateArticle updates an article

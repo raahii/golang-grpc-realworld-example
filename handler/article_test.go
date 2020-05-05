@@ -389,7 +389,7 @@ func TestGetFeedArticles(t *testing.T) {
 		}
 	}
 
-	for _, u := range []*model.User{&barUser, &reqUser} {
+	for _, u := range []*model.User{&barUser} {
 		err := h.us.Follow(&reqUser, u)
 		if err != nil {
 			t.Fatalf("failed to create initial user relationship: %v", err)
@@ -424,23 +424,45 @@ func TestGetFeedArticles(t *testing.T) {
 
 	tests := []struct {
 		title    string
+		reqUser  *model.User
 		req      *pb.GetFeedArticlesRequest
 		expected []*model.Article
 		hasError bool
 	}{
 		{
 			"get articles with default queries",
+			&reqUser,
 			&pb.GetFeedArticlesRequest{
 				Limit:  0,
 				Offset: 0,
 			},
-			articles,
+			articles[0:5],
+			false,
+		},
+		{
+			"get articles with queries",
+			&reqUser,
+			&pb.GetFeedArticlesRequest{
+				Limit:  2,
+				Offset: 1,
+			},
+			articles[1:3],
+			false,
+		},
+		{
+			"get articles of user has no following user",
+			&fooUser,
+			&pb.GetFeedArticlesRequest{
+				Limit:  2,
+				Offset: 1,
+			},
+			[]*model.Article{},
 			false,
 		},
 	}
 
 	for _, tt := range tests {
-		token, err := auth.GenerateToken(reqUser.ID)
+		token, err := auth.GenerateToken(tt.reqUser.ID)
 		if err != nil {
 			t.Error(err)
 		}

@@ -76,3 +76,24 @@ func (s *UserStore) Follow(a *model.User, b *model.User) error {
 func (s *UserStore) Unfollow(a *model.User, b *model.User) error {
 	return s.db.Model(a).Association("Follows").Delete(b).Error
 }
+
+// GetFollowingUserIDs returns user ids current user follows
+func (s *UserStore) GetFollowingUserIDs(m *model.User) ([]uint, error) {
+	rows, err := s.db.Table("follows").
+		Select("to_user_id").
+		Where("from_user_id = ?", m.ID).
+		Rows()
+	if err != nil {
+		return []uint{}, err
+	}
+	defer rows.Close()
+
+	var ids []uint
+	for rows.Next() {
+		var id uint
+		rows.Scan(&id)
+		ids = append(ids, id)
+	}
+
+	return ids, nil
+}
