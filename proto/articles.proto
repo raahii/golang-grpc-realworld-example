@@ -39,6 +39,11 @@ service Articles {
       get: "/articles"
     };
   }
+  rpc GetFeedArticles (GetFeedArticlesRequest) returns (ArticlesResponse) {
+    option (google.api.http) = {
+      get: "/articles/feed"
+    };
+  }
   rpc UpdateArticle (UpdateArticleRequest) returns (ArticleResponse) {
     option (google.api.http) = {
       put: "/articles/{article.slug}"
@@ -72,6 +77,11 @@ message GetArticlesRequest {
   string favorited = 3;
   int64 limit = 4;
   int64 offset = 5;
+}
+
+message GetFeedArticlesRequest {
+  int64 limit = 1;
+  int64 offset = 2;
 }
 
 message UpdateArticleRequest {

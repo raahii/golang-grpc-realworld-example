@@ -273,7 +273,7 @@ func TestGetArticles(t *testing.T) {
 				Tag:       "",
 				Author:    "",
 				Favorited: "",
-				Limit:     20,
+				Limit:     0,
 				Offset:    0,
 			},
 			articles,
@@ -352,6 +352,116 @@ func TestGetArticles(t *testing.T) {
 
 		assert.Len(t, resp.GetArticles(), len(tt.expected))
 		for i := 0; i < len(tt.expected); i++ {
+			got := resp.GetArticles()[i]
+			expected := tt.expected[i]
+
+			assert.Equal(t, expected.Title, got.GetTitle())
+			assert.Equal(t, expected.Author.Username, got.GetAuthor().GetUsername())
+		}
+	}
+}
+
+func TestGetFeedArticles(t *testing.T) {
+	h, cleaner := setUp(t)
+	defer cleaner(t)
+
+	fooUser := model.User{
+		Username: "foo",
+		Email:    "foo@example.com",
+		Password: "secret",
+	}
+
+	barUser := model.User{
+		Username: "bar",
+		Email:    "bar@example.com",
+		Password: "secret",
+	}
+
+	reqUser := model.User{
+		Username: "req",
+		Email:    "req@example.com",
+		Password: "secret",
+	}
+
+	for _, u := range []*model.User{&fooUser, &barUser, &reqUser} {
+		if err := h.us.Create(u); err != nil {
+			t.Fatalf("failed to create initial user record: %v", err)
+		}
+	}
+
+	for _, u := range []*model.User{&barUser, &reqUser} {
+		err := h.us.Follow(&reqUser, u)
+		if err != nil {
+			t.Fatalf("failed to create initial user relationship: %v", err)
+		}
+	}
+
+	tag := model.Tag{Name: "hoge"}
+
+	articles := make([]*model.Article, 10)
+	for i := 0; i < 10; i++ {
+		idStr := fmt.Sprintf("%d", i)
+		a := model.Article{
+			Title:       idStr,
+			Description: idStr,
+			Body:        idStr,
+		}
+		if i < 5 {
+			a.Author = fooUser
+			a.Tags = []model.Tag{tag}
+		} else {
+			a.Author = barUser
+		}
+
+		articles[10-i-1] = &a
+	}
+
+	for _, a := range articles {
+		if err := h.as.Create(a); err != nil {
+			t.Fatalf("failed to create initial article record: %v", err)
+		}
+	}
+
+	tests := []struct {
+		title    string
+		req      *pb.GetFeedArticlesRequest
+		expected []*model.Article
+		hasError bool
+	}{
+		{
+			"get articles with default queries",
+			&pb.GetFeedArticlesRequest{
+				Limit:  0,
+				Offset: 0,
+			},
+			articles,
+			false,
+		},
+	}
+
+	for _, tt := range tests {
+		token, err := auth.GenerateToken(reqUser.ID)
+		if err != nil {
+			t.Error(err)
+		}
+
+		ctx := ctxWithToken(context.Background(), token)
+		resp, err := h.GetFeedArticles(ctx, tt.req)
+		if tt.hasError {
+			if err == nil {
+				t.Errorf("%q expected to fail, but succeeded.", tt.title)
+				t.FailNow()
+			}
+			continue
+		}
+
+		if !tt.hasError && err != nil {
+			t.Errorf("%q expected to succeed, but failed. %v", tt.title, err)
+			t.FailNow()
+		}
+
+		assert.Len(t, resp.GetArticles(), len(tt.expected))
+		for i := 0; i < len(resp.GetArticles()); i++ {
 			got := resp.GetArticles()[i]
 			expected := tt.expected[i]
 

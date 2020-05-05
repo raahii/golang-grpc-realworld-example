@@ -174,6 +174,12 @@ func (h *Handler) GetArticles(ctx context.Context, req *pb.GetArticlesRequest) (
 	return &pb.ArticlesResponse{Articles: pas}, nil
 }
 
+// GetFeedArticles gets recent articles from users current user follow
+func (h *Handler) GetFeedArticles(ctx context.Context, req *pb.GetFeedArticlesRequest) (*pb.ArticlesResponse, error) {
+	h.logger.Info().Msgf("Get feed article | req: %+v\n", req)
+	return &pb.ArticlesResponse{}, nil
+}
+
 // UpdateArticle updates an article
 func (h *Handler) UpdateArticle(ctx context.Context, req *pb.UpdateArticleRequest) (*pb.ArticleResponse, error) {
 	h.logger.Info().Msgf("Update artcile | req: %+v\n", req)
