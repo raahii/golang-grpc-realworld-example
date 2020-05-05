@@ -12,12 +12,13 @@ import (
 // Article model
 type Article struct {
 	gorm.Model
-	Title       string `gorm:"not null"`
-	Description string `gorm:"not null"`
-	Body        string `gorm:"not null"`
-	Tags        []Tag  `gorm:"many2many:article_tags"`
-	Author      User   `gorm:"foreignkey:UserID"`
-	UserID      uint   `gorm:"not null"`
+	Title          string `gorm:"not null"`
+	Description    string `gorm:"not null"`
+	Body           string `gorm:"not null"`
+	Tags           []Tag  `gorm:"many2many:article_tags"`
+	Author         User   `gorm:"foreignkey:UserID"`
+	UserID         uint   `gorm:"not null"`
+	FavoritedUsers []User `gorm:"many2many:favorite_articles"`
 }
 
 // Validate validates fields of article model

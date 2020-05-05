@@ -354,3 +354,8 @@ func (h *Handler) DeleteArticle(ctx context.Context, req *pb.DeleteArticleReques
 
 	return &pb.Empty{}, nil
 }
+
+// FavoriteArticle add an article to user favorites
+func (h *Handler) FavoriteArticle(ctx context.Context, req *pb.FavoriteArticleRequest) (*pb.ArticleResponse, error) {
+	return &pb.ArticleResponse{}, nil
+}

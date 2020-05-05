@@ -14,12 +14,13 @@ import (
 // User is user model
 type User struct {
 	gorm.Model
-	Username string `gorm:"unique_index;not null"`
-	Email    string `gorm:"unique_index;not null"`
-	Password string `gorm:"not null"`
-	Bio      string `gorm:"not null"`
-	Image    string `gorm:"not null"`
-	Follows  []User `gorm:"many2many:follows;jointable_foreignkey:from_user_id;association_jointable_foreignkey:to_user_id"`
+	Username         string    `gorm:"unique_index;not null"`
+	Email            string    `gorm:"unique_index;not null"`
+	Password         string    `gorm:"not null"`
+	Bio              string    `gorm:"not null"`
+	Image            string    `gorm:"not null"`
+	Follows          []User    `gorm:"many2many:follows;jointable_foreignkey:from_user_id;association_jointable_foreignkey:to_user_id"`
+	FavoriteArticles []Article `gorm:"many2many:favorite_articles;"`
 }
 
 // Validate validates fields of user model

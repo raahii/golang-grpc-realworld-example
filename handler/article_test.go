@@ -79,7 +79,7 @@ func TestCreateArticle(t *testing.T) {
 		assert.True(t, got.GetCreatedAt().GetNanos() > requestTime.GetNanos())
 		assert.True(t, got.GetUpdatedAt().GetNanos() > requestTime.GetNanos())
 		assert.False(t, got.GetFavorited())
-		assert.Equal(t, int64(0), got.GetFavoriteCount())
+		assert.Equal(t, int64(0), got.GetFavoritesCount())
 
 		author := got.GetAuthor()
 		assert.Equal(t, fooUser.Username, author.GetUsername())
@@ -197,7 +197,7 @@ func TestGetArticle(t *testing.T) {
 		}
 		assert.ElementsMatch(t, tags, got.GetTagList())
 		assert.Equal(t, tt.favorited, got.GetFavorited())
-		assert.Equal(t, int64(0), got.GetFavoriteCount())
+		assert.Equal(t, int64(0), got.GetFavoritesCount())
 
 		author := got.GetAuthor()
 		assert.Equal(t, fooUser.Username, author.GetUsername())
@@ -635,7 +635,7 @@ func TestUpdateArticle(t *testing.T) {
 
 		assert.ElementsMatch(t, tt.expected.GetTagList(), got.GetTagList())
 		assert.Equal(t, tt.expected.GetFavorited(), got.GetFavorited())
-		assert.Equal(t, tt.expected.GetFavoriteCount(), got.GetFavoriteCount())
+		assert.Equal(t, tt.expected.GetFavoritesCount(), got.GetFavoritesCount())
 
 		gotAuthor := got.GetAuthor()
 		expAuthor := tt.expected.GetAuthor()
@@ -731,5 +731,94 @@ func TestDeleteArticle(t *testing.T) {
 			t.Errorf("%q expected to succeed, but failed. %v", tt.title, err)
 			t.FailNow()
 		}
+	}
+}
+
+func TestFavoriteArticle(t *testing.T) {
+	h, cleaner := setUp(t)
+	defer cleaner(t)
+
+	fooUser := model.User{
+		Username: "foo",
+		Email:    "foo@example.com",
+		Password: "secret",
+	}
+
+	barUser := model.User{
+		Username: "bar",
+		Email:    "bar@example.com",
+		Password: "secret",
+	}
+
+	for _, u := range []*model.User{&fooUser, &barUser} {
+		if err := h.us.Create(u); err != nil {
+			t.Fatalf("failed to create initial user record: %v", err)
+		}
+	}
+
+	af := model.Article{
+		Title:       "original title",
+		Description: "original desc",
+		Body:        "original body",
+		Author:      fooUser,
+		Tags:        []model.Tag{model.Tag{Name: "hoge"}},
+	}
+
+	for _, a := range []*model.Article{&af} {
+		if err := h.as.Create(a); err != nil {
+			t.Fatalf("failed to create initial article record: %v", err)
+		}
+	}
+
+	tests := []struct {
+		title    string
+		reqUser  *model.User
+		req      *pb.FavoriteArticleRequest
+		hasError bool
+	}{
+		{
+			"favorite user's own article: success",
+			&fooUser,
+			&pb.FavoriteArticleRequest{
+				Slug: fmt.Sprintf("%d", af.ID),
+			},
+			false,
+		},
+		{
+			"favorite other user's article: success",
+			&barUser,
+			&pb.FavoriteArticleRequest{
+				Slug: fmt.Sprintf("%d", af.ID),
+			},
+			false,
+		},
+	}
+
+	var favoritesCount int64
+	for _, tt := range tests {
+		token, err := auth.GenerateToken(tt.reqUser.ID)
+		if err != nil {
+			t.Error(err)
+		}
+
+		ctx := ctxWithToken(context.Background(), token)
+		resp, err := h.FavoriteArticle(ctx, tt.req)
+		if tt.hasError {
+			if err == nil {
+				t.Errorf("%q expected to fail, but succeeded.", tt.title)
+				t.FailNow()
+			}
+			continue
+		}
+		favoritesCount++
+
+		if !tt.hasError && err != nil {
+			t.Errorf("%q expected to succeed, but failed. %v", tt.title, err)
+			t.FailNow()
+		}
+
+		got := resp.GetArticle()
+		assert.True(t, got.GetFavorited())
+		assert.Equal(t, favoritesCount, got.GetFavoritesCount())
 	}
 }

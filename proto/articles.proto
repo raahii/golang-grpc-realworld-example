@@ -18,7 +18,7 @@ message Article {
   google.protobuf.Timestamp createdAt = 6;
   google.protobuf.Timestamp updatedAt = 7;
   bool favorited = 8;
-  int64 favoriteCount = 9;
+  int64 favoritesCount = 9;
   profile.Profile author = 10;
 }
 
@@ -52,6 +52,11 @@ service Articles {
   rpc DeleteArticle (DeleteArticleRequest) returns (empty.Empty) {
     option (google.api.http) = {
       delete: "/articles/{slug}"
+    };
+  }
+  rpc FavoriteArticle (FavoriteArticleRequest) returns (ArticleResponse) {
+    option (google.api.http) = {
+      post: "/articles/{slug}/favorite"
     };
   }
 }
@@ -95,6 +100,10 @@ message UpdateArticleRequest {
 }
 
 message DeleteArticleRequest {
+  string slug = 1;
+}
+
+message FavoriteArticleRequest {
   string slug = 1;
 }
 
