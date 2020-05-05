@@ -159,9 +159,6 @@ func (h *Handler) GetArticles(ctx context.Context, req *pb.GetArticlesRequest) (
 		favorited := false
 		pa := a.ProtoArticle(favorited)
 
-		// pp.Println(a)
-		// time.Sleep(100 * time.Second)
-
 		// get whether current user follows article author
 		following, err := h.us.IsFollowing(currentUser, &a.Author)
 		if err != nil {
@@ -175,4 +172,10 @@ func (h *Handler) GetArticles(ctx context.Context, req *pb.GetArticlesRequest) (
 	}
 
 	return &pb.ArticlesResponse{Articles: pas}, nil
+}
+
+// UpdateArticle updates an article
+func (h *Handler) UpdateArticle(ctx context.Context, req *pb.UpdateArticleRequest) (*pb.ArticleResponse, error) {
+	h.logger.Info().Msgf("Update artciles | req: %+v\n", req)
+	return &pb.ArticleResponse{}, nil
 }

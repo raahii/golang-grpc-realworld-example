@@ -360,3 +360,97 @@ func TestGetArticles(t *testing.T) {
 		}
 	}
 }
+
+func TestUpdateArticle(t *testing.T) {
+	h, cleaner := setUp(t)
+	defer cleaner(t)
+
+	fooUser := model.User{
+		Username: "foo",
+		Email:    "foo@example.com",
+		Password: "secret",
+	}
+
+	for _, u := range []*model.User{&fooUser} {
+		if err := h.us.Create(u); err != nil {
+			t.Fatalf("failed to create initial user record: %v", err)
+		}
+	}
+
+	a := model.Article{
+		Title:       "original title",
+		Description: "original desc",
+		Body:        "original body",
+		Author:      fooUser,
+		Tags:        []model.Tag{model.Tag{Name: "hoge"}},
+	}
+
+	for _, a := range []*model.Article{&a} {
+		if err := h.as.Create(a); err != nil {
+			t.Fatalf("failed to create initial article record: %v", err)
+		}
+	}
+
+	tests := []struct {
+		title    string
+		req      *pb.UpdateArticleRequest
+		expected *pb.Article
+		hasError bool
+	}{
+		{
+			"update article: success",
+			&pb.UpdateArticleRequest{
+				Article: &pb.UpdateArticleRequest_Article{
+					Title: "modified title",
+				},
+			},
+			&pb.Article{
+				Title:       "modified title",
+				Description: "original desc",
+				Body:        "original body",
+				Author:      fooUser.ProtoProfile(false),
+				TagList:     []string{"hoge"},
+			},
+			false,
+		},
+	}
+
+	for _, tt := range tests {
+		token, err := auth.GenerateToken(fooUser.ID)
+		if err != nil {
+			t.Error(err)
+		}
+
+		ctx := ctxWithToken(context.Background(), token)
+		resp, err := h.UpdateArticle(ctx, tt.req)
+		if tt.hasError {
+			if err == nil {
+				t.Errorf("%q expected to fail, but succeeded.", tt.title)
+				t.FailNow()
+			}
+			continue
+		}
+
+		if !tt.hasError && err != nil {
+			t.Errorf("%q expected to succeed, but failed. %v", tt.title, err)
+			t.FailNow()
+		}
+
+		got := resp.GetArticle()
+		assert.Equal(t, tt.expected.GetSlug(), got.GetSlug())
+		assert.Equal(t, tt.expected.GetTitle(), got.GetTitle())
+		assert.Equal(t, tt.expected.GetDescription(), got.GetDescription())
+		assert.Equal(t, tt.expected.GetBody(), got.GetBody())
+
+		assert.ElementsMatch(t, tt.expected.GetTagList(), got.GetTagList())
+		assert.Equal(t, tt.expected.GetFavorited(), got.GetFavorited())
+		assert.Equal(t, tt.expected.GetFavoriteCount(), got.GetFavoriteCount())
+
+		gotAuthor := got.GetAuthor()
+		expAuthor := tt.expected.GetAuthor()
+		assert.Equal(t, expAuthor.GetUsername(), gotAuthor.GetUsername())
+		assert.Equal(t, expAuthor.GetBio(), gotAuthor.GetBio())
+		assert.Equal(t, expAuthor.GetImage(), gotAuthor.GetImage())
+		assert.Equal(t, expAuthor.GetFollowing(), gotAuthor.GetFollowing())
+	}
+}

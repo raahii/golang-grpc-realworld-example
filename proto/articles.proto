@@ -38,6 +38,11 @@ service Articles {
       get: "/articles"
     };
   }
+  rpc UpdateArticle (UpdateArticleRequest) returns (ArticleResponse) {
+    option (google.api.http) = {
+      put: "/articles/{article.slug}"
+    };
+  }
 }
 
 message CreateAritcleRequest {
@@ -61,6 +66,16 @@ message GetArticlesRequest {
   string favorited = 3;
   int64 limit = 4;
   int64 offset = 5;
+}
+
+message UpdateArticleRequest {
+  message Article {
+    string title = 1;
+    string description = 2;
+    string body = 3;
+    string slug = 4;
+  }
+  Article article = 1;
 }
 
 message ArticleResponse {

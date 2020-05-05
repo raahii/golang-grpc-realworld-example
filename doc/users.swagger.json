@@ -13,7 +13,7 @@
   "paths": {
     "/users": {
       "get": {
-        "operationId": "UpdateUser",
+        "operationId": "CurrentUser",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -28,38 +28,6 @@
             }
           }
         },
-        "parameters": [
-          {
-            "name": "user.email",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "user.password",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "user.username",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "user.bio",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "user.image",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
-        ],
         "tags": [
           "Users"
         ]
@@ -90,6 +58,26 @@
             }
           }
         ],
+        "tags": [
+          "Users"
+        ]
+      },
+      "put": {
+        "operationId": "UpdateUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/profileUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
         "tags": [
           "Users"
         ]

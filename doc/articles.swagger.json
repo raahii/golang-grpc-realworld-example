@@ -87,6 +87,36 @@
         ]
       }
     },
+    "/articles/{article.slug}": {
+      "put": {
+        "operationId": "UpdateArticle",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/profileArticleResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "article.slug",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Articles"
+        ]
+      }
+    },
     "/articles/{slug}": {
       "get": {
         "operationId": "GetArticle",
@@ -215,6 +245,23 @@
         "following": {
           "type": "boolean",
           "format": "boolean"
+        }
+      }
+    },
+    "profileUpdateArticleRequestArticle": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "body": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
         }
       }
     },

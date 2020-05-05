@@ -30,7 +30,7 @@ service Users {
 
   rpc UpdateUser (UpdateUserRequest) returns (UserResponse) {
     option (google.api.http) = {
-      get: "/users"
+      put: "/users"
     };
   }
 }
