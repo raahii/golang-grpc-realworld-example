@@ -25,8 +25,9 @@ func setUp(t *testing.T) (*Handler, func(t *testing.T)) {
 	}
 
 	us := store.NewUserStore(d)
+	as := store.NewArticleStore(d)
 
-	return New(&l, d, us), func(t *testing.T) {
+	return New(&l, d, us, as), func(t *testing.T) {
 		err := db.DropTestDB(d)
 		if err != nil {
 			t.Fatal(fmt.Errorf("failed to clean database: %w", err))

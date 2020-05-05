@@ -14,11 +14,12 @@ type Handler struct {
 	logger *zerolog.Logger
 	db     *gorm.DB
 	us     *store.UserStore
+	as     *store.ArticleStore
 }
 
 // New returns a new handler with logger and database
-func New(l *zerolog.Logger, d *gorm.DB, us *store.UserStore) *Handler {
-	return &Handler{logger: l, db: d, us: us}
+func New(l *zerolog.Logger, d *gorm.DB, us *store.UserStore, as *store.ArticleStore) *Handler {
+	return &Handler{logger: l, db: d, us: us, as: as}
 }
 
 // SayHello is a dummy method

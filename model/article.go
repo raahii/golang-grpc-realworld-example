@@ -80,6 +80,30 @@ func (a *Article) BindTo(pa *pb.Article, requestUser *User, db *gorm.DB) error {
 	return nil
 }
 
+// ProtoArticle generates proto aritcle model from article
+func (a *Article) ProtoArticle(favorited bool) *pb.Article {
+	pa := pb.Article{
+		Slug:        fmt.Sprintf("%d", a.ID),
+		Title:       a.Title,
+		Description: a.Description,
+		Body:        a.Body,
+		Favorited:   favorited,
+	}
+
+	// article tags
+	tags := make([]string, 0, len(a.Tags))
+	for _, t := range a.Tags {
+		tags = append(tags, t.Name)
+	}
+	pa.TagList = tags
+
+	// article dates
+	pa.CreatedAt, _ = ptypes.TimestampProto(a.CreatedAt)
+	pa.UpdatedAt, _ = ptypes.TimestampProto(a.UpdatedAt)
+
+	return &pa
+}
+
 // Tag model
 type Tag struct {
 	gorm.Model

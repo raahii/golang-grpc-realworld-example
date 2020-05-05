@@ -35,7 +35,7 @@ func (h *Handler) CreateArticle(ctx context.Context, req *pb.CreateAritcleReques
 		tags = append(tags, model.Tag{Name: t})
 	}
 
-	a := model.Article{
+	article := model.Article{
 		Title:       ra.GetTitle(),
 		Description: ra.GetDescription(),
 		Body:        ra.GetBody(),
@@ -43,33 +43,40 @@ func (h *Handler) CreateArticle(ctx context.Context, req *pb.CreateAritcleReques
 		Tags:        tags,
 	}
 
-	err = a.Validate()
+	err = article.Validate()
 	if err != nil {
 		msg := "validation error"
 		h.logger.Error().Err(err).Msg(msg)
 		return nil, status.Error(codes.InvalidArgument, msg)
 	}
 
-	err = h.db.Create(&a).Error
+	err = h.as.Create(&article)
 	if err != nil {
 		msg := "Failed to create user."
 		h.logger.Error().Err(err).Msg(msg)
 		return nil, status.Error(codes.Canceled, msg)
 	}
 
-	var pa pb.Article
-	err = a.BindTo(&pa, currentUser, h.db)
-	if err != nil {
-		msg := "Failed to convert model.User to pb.User"
-		h.logger.Error().Err(err).Msg(msg)
-		return nil, status.Error(codes.Aborted, "internal server error")
-	}
+	// get whether the article is current user's favorite
+	favorited := false
+	pa := article.ProtoArticle(favorited)
 
-	return &pb.ArticleResponse{Article: &pa}, nil
+	// get whether current user follows article author
+	following, err := h.us.IsFollowing(currentUser, &article.Author)
+	if err != nil {
+		msg := "failed to get following status"
+		h.logger.Error().Err(err).Msg(msg)
+		return nil, status.Error(codes.NotFound, "internal server error")
+	}
+	pa.Author = article.Author.ProtoProfile(following)
+
+	return &pb.ArticleResponse{Article: pa}, nil
 }
 
 // GetArticle gets a article
 func (h *Handler) GetArticle(ctx context.Context, req *pb.GetArticleRequest) (*pb.ArticleResponse, error) {
+	h.logger.Info().Msgf("Get artcile | req: %+v\n", req)
+
 	// get article
 	articleID, err := strconv.Atoi(req.GetSlug())
 	if err != nil {
@@ -78,8 +85,7 @@ func (h *Handler) GetArticle(ctx context.Context, req *pb.GetArticleRequest) (*p
 		return nil, status.Error(codes.InvalidArgument, "invalid article id")
 	}
 
-	var a model.Article
-	err = h.db.Preload("Tags").Preload("Author").Find(&a, articleID).Error
+	article, err := h.as.GetByID(uint(articleID))
 	if err != nil {
 		msg := fmt.Sprintf("requested article (slug=%d) not found", articleID)
 		h.logger.Error().Err(err).Msg(msg)
@@ -100,63 +106,74 @@ func (h *Handler) GetArticle(ctx context.Context, req *pb.GetArticleRequest) (*p
 		}
 	}
 
-	// bind article
-	var pa pb.Article
-	err = a.BindTo(&pa, currentUser, h.db)
-	if err != nil {
-		msg := "failed to convert model.User to pb.User"
-		h.logger.Error().Err(err).Msg(msg)
-		return nil, status.Error(codes.Aborted, "internal server error")
+	if currentUser == nil {
+		pa := article.ProtoArticle(false)
+		pa.Author = article.Author.ProtoProfile(false)
+		return &pb.ArticleResponse{Article: pa}, nil
 	}
 
-	return &pb.ArticleResponse{Article: &pa}, nil
+	// get whether the article is current user's favorite
+	favorited := false
+	pa := article.ProtoArticle(favorited)
+
+	// get whether current user follows article author
+	following, err := h.us.IsFollowing(currentUser, &article.Author)
+	if err != nil {
+		msg := "failed to get following status"
+		h.logger.Error().Err(err).Msg(msg)
+		return nil, status.Error(codes.NotFound, "internal server error")
+	}
+	pa.Author = article.Author.ProtoProfile(following)
+
+	return &pb.ArticleResponse{Article: pa}, nil
 }
 
 // GetArticles gets recent articles globally
 func (h *Handler) GetArticles(ctx context.Context, req *pb.GetArticlesRequest) (*pb.ArticlesResponse, error) {
+	h.logger.Info().Msgf("Get artciles | req: %+v\n", req)
+
 	limitQuery := req.GetLimit()
 	if limitQuery == 0 {
 		limitQuery = 20
 	}
-	offsetQuery := req.GetOffset()
 
-	d := h.db.Preload("Author")
-
-	// author query (has one)
-	if req.GetAuthor() != "" {
-		d = d.Joins("join users on articles.user_id = users.id").
-			Where("users.username = ?", req.GetAuthor())
-	}
-
-	// tag query (many to many)
-	if req.GetTag() != "" {
-		d = d.Joins(
-			"join article_tags on articles.id = article_tags.article_id "+
-				"join tags on tags.id = article_tags.tag_id").
-			Where("tags.name = ?", req.GetTag())
-	}
-
-	// TODO: favorite query
-
-	// offset query, limit query
-	d = d.Offset(offsetQuery).Limit(limitQuery)
-
-	var as []model.Article
-	if err := d.Find(&as).Error; err != nil {
+	as, err := h.as.GetArticles(req.GetTag(), req.GetAuthor(), limitQuery, req.GetOffset())
+	if err != nil {
 		h.logger.Error().Err(err).Msg("failed to search articles in the database")
-		pp.Println(err)
 		return nil, status.Error(codes.Aborted, "internal server error")
+	}
+
+	userID, err := auth.GetUserID(ctx)
+	if err != nil {
+		h.logger.Error().Err(err).Msg("unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
+	}
+
+	currentUser, err := h.us.GetByID(userID)
+	if err != nil {
+		h.logger.Error().Err(err).Msg("current user not found")
+		return nil, status.Error(codes.NotFound, "user not found")
 	}
 
 	pas := make([]*pb.Article, 0, len(as))
 	for _, a := range as {
-		var pa pb.Article
-		err := a.BindTo(&pa, nil, nil)
+		// get whether the article is current user's favorite
+		favorited := false
+		pa := a.ProtoArticle(favorited)
+
+		// pp.Println(a)
+		// time.Sleep(100 * time.Second)
+
+		// get whether current user follows article author
+		following, err := h.us.IsFollowing(currentUser, &a.Author)
 		if err != nil {
-			h.logger.Error().Err(err).Msg("failed to bind model.Article to pb.Article")
-			return nil, status.Error(codes.Aborted, "internal server error")
+			msg := "failed to get following status"
+			h.logger.Error().Err(err).Msg(msg)
+			return nil, status.Error(codes.NotFound, "internal server error")
 		}
-		pas = append(pas, &pa)
+		pa.Author = a.Author.ProtoProfile(following)
+
+		pas = append(pas, pa)
 	}
 
 	return &pb.ArticlesResponse{Articles: pas}, nil

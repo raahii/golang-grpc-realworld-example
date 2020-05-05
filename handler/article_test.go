@@ -228,7 +228,13 @@ func TestGetArticles(t *testing.T) {
 		Password: "secret",
 	}
 
-	for _, u := range []*model.User{&fooUser, &barUser} {
+	reqUser := model.User{
+		Username: "req",
+		Email:    "req@example.com",
+		Password: "secret",
+	}
+
+	for _, u := range []*model.User{&fooUser, &barUser, &reqUser} {
 		if err := h.db.Create(u).Error; err != nil {
 			t.Fatalf("failed to create initial user record: %v", err)
 		}
@@ -332,7 +338,12 @@ func TestGetArticles(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		ctx := context.Background()
+		token, err := auth.GenerateToken(reqUser.ID)
+		if err != nil {
+			t.Error(err)
+		}
+
+		ctx := ctxWithToken(context.Background(), token)
 		resp, err := h.GetArticles(ctx, tt.req)
 		if tt.hasError {
 			if err == nil {
