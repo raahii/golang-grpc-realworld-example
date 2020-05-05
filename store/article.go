@@ -139,3 +139,27 @@ func (s *ArticleStore) AddFavorite(a *model.Article, u *model.User) error {
 
 	return nil
 }
+
+// DeleteFavorite unfavorite an article
+func (s *ArticleStore) DeleteFavorite(a *model.Article, u *model.User) error {
+	tx := s.db.Begin()
+
+	err := tx.Model(a).Association("FavoritedUsers").
+		Delete(u).Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	err = tx.Model(a).
+		Update("favorites_count", gorm.Expr("favorites_count - ?", 1)).Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	tx.Commit()
+	a.FavoritesCount--
+
+	return nil
+}

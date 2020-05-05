@@ -59,6 +59,11 @@ service Articles {
       post: "/articles/{slug}/favorite"
     };
   }
+  rpc UnfavoriteArticle (UnfavoriteArticleRequest) returns (ArticleResponse) {
+    option (google.api.http) = {
+      delete: "/articles/{slug}/favorite"
+    };
+  }
 }
 
 message CreateAritcleRequest {
@@ -104,6 +109,10 @@ message DeleteArticleRequest {
 }
 
 message FavoriteArticleRequest {
+  string slug = 1;
+}
+
+message UnfavoriteArticleRequest {
   string slug = 1;
 }
 

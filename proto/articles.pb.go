@@ -519,6 +519,53 @@ func (x *FavoriteArticleRequest) GetSlug() string {
 	return ""
 }
 
+type UnfavoriteArticleRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Slug string `protobuf:"bytes,1,opt,name=slug,proto3" json:"slug,omitempty"`
+}
+
+func (x *UnfavoriteArticleRequest) Reset() {
+	*x = UnfavoriteArticleRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_articles_proto_msgTypes[8]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *UnfavoriteArticleRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UnfavoriteArticleRequest) ProtoMessage() {}
+
+func (x *UnfavoriteArticleRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_articles_proto_msgTypes[8]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UnfavoriteArticleRequest.ProtoReflect.Descriptor instead.
+func (*UnfavoriteArticleRequest) Descriptor() ([]byte, []int) {
+	return file_articles_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *UnfavoriteArticleRequest) GetSlug() string {
+	if x != nil {
+		return x.Slug
+	}
+	return ""
+}
+
 type ArticleResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -530,7 +577,7 @@ type ArticleResponse struct {
 func (x *ArticleResponse) Reset() {
 	*x = ArticleResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_articles_proto_msgTypes[8]
+		mi := &file_articles_proto_msgTypes[9]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -543,7 +590,7 @@ func (x *ArticleResponse) String() string {
 func (*ArticleResponse) ProtoMessage() {}
 
 func (x *ArticleResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_articles_proto_msgTypes[8]
+	mi := &file_articles_proto_msgTypes[9]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -556,7 +603,7 @@ func (x *ArticleResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ArticleResponse.ProtoReflect.Descriptor instead.
 func (*ArticleResponse) Descriptor() ([]byte, []int) {
-	return file_articles_proto_rawDescGZIP(), []int{8}
+	return file_articles_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ArticleResponse) GetArticle() *Article {
@@ -577,7 +624,7 @@ type ArticlesResponse struct {
 func (x *ArticlesResponse) Reset() {
 	*x = ArticlesResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_articles_proto_msgTypes[9]
+		mi := &file_articles_proto_msgTypes[10]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -590,7 +637,7 @@ func (x *ArticlesResponse) String() string {
 func (*ArticlesResponse) ProtoMessage() {}
 
 func (x *ArticlesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_articles_proto_msgTypes[9]
+	mi := &file_articles_proto_msgTypes[10]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -603,7 +650,7 @@ func (x *ArticlesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ArticlesResponse.ProtoReflect.Descriptor instead.
 func (*ArticlesResponse) Descriptor() ([]byte, []int) {
-	return file_articles_proto_rawDescGZIP(), []int{9}
+	return file_articles_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *ArticlesResponse) GetArticles() []*Article {
@@ -627,7 +674,7 @@ type CreateAritcleRequest_Article struct {
 func (x *CreateAritcleRequest_Article) Reset() {
 	*x = CreateAritcleRequest_Article{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_articles_proto_msgTypes[10]
+		mi := &file_articles_proto_msgTypes[11]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -640,7 +687,7 @@ func (x *CreateAritcleRequest_Article) String() string {
 func (*CreateAritcleRequest_Article) ProtoMessage() {}
 
 func (x *CreateAritcleRequest_Article) ProtoReflect() protoreflect.Message {
-	mi := &file_articles_proto_msgTypes[10]
+	mi := &file_articles_proto_msgTypes[11]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -698,7 +745,7 @@ type UpdateArticleRequest_Article struct {
 func (x *UpdateArticleRequest_Article) Reset() {
 	*x = UpdateArticleRequest_Article{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_articles_proto_msgTypes[11]
+		mi := &file_articles_proto_msgTypes[12]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -711,7 +758,7 @@ func (x *UpdateArticleRequest_Article) String() string {
 func (*UpdateArticleRequest_Article) ProtoMessage() {}
 
 func (x *UpdateArticleRequest_Article) ProtoReflect() protoreflect.Message {
-	mi := &file_articles_proto_msgTypes[11]
+	mi := &file_articles_proto_msgTypes[12]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -834,6 +881,9 @@ var file_articles_proto_rawDesc = []byte{
 	0x01, 0x28, 0x09, 0x52, 0x04, 0x73, 0x6c, 0x75, 0x67, 0x22, 0x2c, 0x0a, 0x16, 0x46, 0x61, 0x76,
 	0x6f, 0x72, 0x69, 0x74, 0x65, 0x41, 0x72, 0x74, 0x69, 0x63, 0x6c, 0x65, 0x52, 0x65, 0x71, 0x75,
 	0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x73, 0x6c, 0x75, 0x67, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x04, 0x73, 0x6c, 0x75, 0x67, 0x22, 0x2e, 0x0a, 0x18, 0x55, 0x6e, 0x66, 0x61, 0x76,
+	0x6f, 0x72, 0x69, 0x74, 0x65, 0x41, 0x72, 0x74, 0x69, 0x63, 0x6c, 0x65, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x73, 0x6c, 0x75, 0x67, 0x18, 0x01, 0x20, 0x01, 0x28,
 	0x09, 0x52, 0x04, 0x73, 0x6c, 0x75, 0x67, 0x22, 0x3d, 0x0a, 0x0f, 0x41, 0x72, 0x74, 0x69, 0x63,
 	0x6c, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2a, 0x0a, 0x07, 0x61, 0x72,
 	0x74, 0x69, 0x63, 0x6c, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x70, 0x72,
@@ -842,7 +892,7 @@ var file_articles_proto_rawDesc = []byte{
 	0x65, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2c, 0x0a, 0x08, 0x61, 0x72,
 	0x74, 0x69, 0x63, 0x6c, 0x65, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x10, 0x2e, 0x70,
 	0x72, 0x6f, 0x66, 0x69, 0x6c, 0x65, 0x2e, 0x41, 0x72, 0x74, 0x69, 0x63, 0x6c, 0x65, 0x52, 0x08,
-	0x61, 0x72, 0x74, 0x69, 0x63, 0x6c, 0x65, 0x73, 0x32, 0xbb, 0x05, 0x0a, 0x08, 0x41, 0x72, 0x74,
+	0x61, 0x72, 0x74, 0x69, 0x63, 0x6c, 0x65, 0x73, 0x32, 0xb0, 0x06, 0x0a, 0x08, 0x41, 0x72, 0x74,
 	0x69, 0x63, 0x6c, 0x65, 0x73, 0x12, 0x5b, 0x0a, 0x0d, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x41,
 	0x72, 0x74, 0x69, 0x63, 0x6c, 0x65, 0x12, 0x1d, 0x2e, 0x70, 0x72, 0x6f, 0x66, 0x69, 0x6c, 0x65,
 	0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x41, 0x72, 0x69, 0x74, 0x63, 0x6c, 0x65, 0x52, 0x65,
@@ -886,8 +936,15 @@ var file_articles_proto_rawDesc = []byte{
 	0x69, 0x6c, 0x65, 0x2e, 0x41, 0x72, 0x74, 0x69, 0x63, 0x6c, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f,
 	0x6e, 0x73, 0x65, 0x22, 0x21, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x1b, 0x22, 0x19, 0x2f, 0x61, 0x72,
 	0x74, 0x69, 0x63, 0x6c, 0x65, 0x73, 0x2f, 0x7b, 0x73, 0x6c, 0x75, 0x67, 0x7d, 0x2f, 0x66, 0x61,
-	0x76, 0x6f, 0x72, 0x69, 0x74, 0x65, 0x42, 0x09, 0x5a, 0x07, 0x2e, 0x3b, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x76, 0x6f, 0x72, 0x69, 0x74, 0x65, 0x12, 0x73, 0x0a, 0x11, 0x55, 0x6e, 0x66, 0x61, 0x76, 0x6f,
+	0x72, 0x69, 0x74, 0x65, 0x41, 0x72, 0x74, 0x69, 0x63, 0x6c, 0x65, 0x12, 0x21, 0x2e, 0x70, 0x72,
+	0x6f, 0x66, 0x69, 0x6c, 0x65, 0x2e, 0x55, 0x6e, 0x66, 0x61, 0x76, 0x6f, 0x72, 0x69, 0x74, 0x65,
+	0x41, 0x72, 0x74, 0x69, 0x63, 0x6c, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x18,
+	0x2e, 0x70, 0x72, 0x6f, 0x66, 0x69, 0x6c, 0x65, 0x2e, 0x41, 0x72, 0x74, 0x69, 0x63, 0x6c, 0x65,
+	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x21, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x1b,
+	0x2a, 0x19, 0x2f, 0x61, 0x72, 0x74, 0x69, 0x63, 0x6c, 0x65, 0x73, 0x2f, 0x7b, 0x73, 0x6c, 0x75,
+	0x67, 0x7d, 0x2f, 0x66, 0x61, 0x76, 0x6f, 0x72, 0x69, 0x74, 0x65, 0x42, 0x09, 0x5a, 0x07, 0x2e,
+	0x3b, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -902,7 +959,7 @@ func file_articles_proto_rawDescGZIP() []byte {
 	return file_articles_proto_rawDescData
 }
 
-var file_articles_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_articles_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_articles_proto_goTypes = []interface{}{
 	(*Article)(nil),                      // 0: profile.Article
 	(*CreateAritcleRequest)(nil),         // 1: profile.CreateAritcleRequest
@@ -912,20 +969,21 @@ var file_articles_proto_goTypes = []interface{}{
 	(*UpdateArticleRequest)(nil),         // 5: profile.UpdateArticleRequest
 	(*DeleteArticleRequest)(nil),         // 6: profile.DeleteArticleRequest
 	(*FavoriteArticleRequest)(nil),       // 7: profile.FavoriteArticleRequest
-	(*ArticleResponse)(nil),              // 8: profile.ArticleResponse
-	(*ArticlesResponse)(nil),             // 9: profile.ArticlesResponse
-	(*CreateAritcleRequest_Article)(nil), // 10: profile.CreateAritcleRequest.Article
-	(*UpdateArticleRequest_Article)(nil), // 11: profile.UpdateArticleRequest.Article
-	(*timestamp.Timestamp)(nil),          // 12: google.protobuf.Timestamp
-	(*Profile)(nil),                      // 13: profile.Profile
-	(*Empty)(nil),                        // 14: empty.Empty
+	(*UnfavoriteArticleRequest)(nil),     // 8: profile.UnfavoriteArticleRequest
+	(*ArticleResponse)(nil),              // 9: profile.ArticleResponse
+	(*ArticlesResponse)(nil),             // 10: profile.ArticlesResponse
+	(*CreateAritcleRequest_Article)(nil), // 11: profile.CreateAritcleRequest.Article
+	(*UpdateArticleRequest_Article)(nil), // 12: profile.UpdateArticleRequest.Article
+	(*timestamp.Timestamp)(nil),          // 13: google.protobuf.Timestamp
+	(*Profile)(nil),                      // 14: profile.Profile
+	(*Empty)(nil),                        // 15: empty.Empty
 }
 var file_articles_proto_depIdxs = []int32{
-	12, // 0: profile.Article.createdAt:type_name -> google.protobuf.Timestamp
-	12, // 1: profile.Article.updatedAt:type_name -> google.protobuf.Timestamp
-	13, // 2: profile.Article.author:type_name -> profile.Profile
-	10, // 3: profile.CreateAritcleRequest.article:type_name -> profile.CreateAritcleRequest.Article
-	11, // 4: profile.UpdateArticleRequest.article:type_name -> profile.UpdateArticleRequest.Article
+	13, // 0: profile.Article.createdAt:type_name -> google.protobuf.Timestamp
+	13, // 1: profile.Article.updatedAt:type_name -> google.protobuf.Timestamp
+	14, // 2: profile.Article.author:type_name -> profile.Profile
+	11, // 3: profile.CreateAritcleRequest.article:type_name -> profile.CreateAritcleRequest.Article
+	12, // 4: profile.UpdateArticleRequest.article:type_name -> profile.UpdateArticleRequest.Article
 	0,  // 5: profile.ArticleResponse.article:type_name -> profile.Article
 	0,  // 6: profile.ArticlesResponse.articles:type_name -> profile.Article
 	1,  // 7: profile.Articles.CreateArticle:input_type -> profile.CreateAritcleRequest
@@ -935,15 +993,17 @@ var file_articles_proto_depIdxs = []int32{
 	5,  // 11: profile.Articles.UpdateArticle:input_type -> profile.UpdateArticleRequest
 	6,  // 12: profile.Articles.DeleteArticle:input_type -> profile.DeleteArticleRequest
 	7,  // 13: profile.Articles.FavoriteArticle:input_type -> profile.FavoriteArticleRequest
-	8,  // 14: profile.Articles.CreateArticle:output_type -> profile.ArticleResponse
-	8,  // 15: profile.Articles.GetArticle:output_type -> profile.ArticleResponse
-	9,  // 16: profile.Articles.GetArticles:output_type -> profile.ArticlesResponse
-	9,  // 17: profile.Articles.GetFeedArticles:output_type -> profile.ArticlesResponse
-	8,  // 18: profile.Articles.UpdateArticle:output_type -> profile.ArticleResponse
-	14, // 19: profile.Articles.DeleteArticle:output_type -> empty.Empty
-	8,  // 20: profile.Articles.FavoriteArticle:output_type -> profile.ArticleResponse
-	14, // [14:21] is the sub-list for method output_type
-	7,  // [7:14] is the sub-list for method input_type
+	8,  // 14: profile.Articles.UnfavoriteArticle:input_type -> profile.UnfavoriteArticleRequest
+	9,  // 15: profile.Articles.CreateArticle:output_type -> profile.ArticleResponse
+	9,  // 16: profile.Articles.GetArticle:output_type -> profile.ArticleResponse
+	10, // 17: profile.Articles.GetArticles:output_type -> profile.ArticlesResponse
+	10, // 18: profile.Articles.GetFeedArticles:output_type -> profile.ArticlesResponse
+	9,  // 19: profile.Articles.UpdateArticle:output_type -> profile.ArticleResponse
+	15, // 20: profile.Articles.DeleteArticle:output_type -> empty.Empty
+	9,  // 21: profile.Articles.FavoriteArticle:output_type -> profile.ArticleResponse
+	9,  // 22: profile.Articles.UnfavoriteArticle:output_type -> profile.ArticleResponse
+	15, // [15:23] is the sub-list for method output_type
+	7,  // [7:15] is the sub-list for method input_type
 	7,  // [7:7] is the sub-list for extension type_name
 	7,  // [7:7] is the sub-list for extension extendee
 	0,  // [0:7] is the sub-list for field type_name
@@ -1054,7 +1114,7 @@ func file_articles_proto_init() {
 			}
 		}
 		file_articles_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ArticleResponse); i {
+			switch v := v.(*UnfavoriteArticleRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1066,7 +1126,7 @@ func file_articles_proto_init() {
 			}
 		}
 		file_articles_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ArticlesResponse); i {
+			switch v := v.(*ArticleResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1078,7 +1138,7 @@ func file_articles_proto_init() {
 			}
 		}
 		file_articles_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CreateAritcleRequest_Article); i {
+			switch v := v.(*ArticlesResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1090,6 +1150,18 @@ func file_articles_proto_init() {
 			}
 		}
 		file_articles_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*CreateAritcleRequest_Article); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_articles_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*UpdateArticleRequest_Article); i {
 			case 0:
 				return &v.state
@@ -1108,7 +1180,7 @@ func file_articles_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_articles_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   12,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
@@ -1141,6 +1213,7 @@ type ArticlesClient interface {
 	UpdateArticle(ctx context.Context, in *UpdateArticleRequest, opts ...grpc.CallOption) (*ArticleResponse, error)
 	DeleteArticle(ctx context.Context, in *DeleteArticleRequest, opts ...grpc.CallOption) (*Empty, error)
 	FavoriteArticle(ctx context.Context, in *FavoriteArticleRequest, opts ...grpc.CallOption) (*ArticleResponse, error)
+	UnfavoriteArticle(ctx context.Context, in *UnfavoriteArticleRequest, opts ...grpc.CallOption) (*ArticleResponse, error)
 }
 
 type articlesClient struct {
@@ -1214,6 +1287,15 @@ func (c *articlesClient) FavoriteArticle(ctx context.Context, in *FavoriteArticl
 	return out, nil
 }
 
+func (c *articlesClient) UnfavoriteArticle(ctx context.Context, in *UnfavoriteArticleRequest, opts ...grpc.CallOption) (*ArticleResponse, error) {
+	out := new(ArticleResponse)
+	err := c.cc.Invoke(ctx, "/profile.Articles/UnfavoriteArticle", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ArticlesServer is the server API for Articles service.
 type ArticlesServer interface {
 	CreateArticle(context.Context, *CreateAritcleRequest) (*ArticleResponse, error)
@@ -1223,6 +1305,7 @@ type ArticlesServer interface {
 	UpdateArticle(context.Context, *UpdateArticleRequest) (*ArticleResponse, error)
 	DeleteArticle(context.Context, *DeleteArticleRequest) (*Empty, error)
 	FavoriteArticle(context.Context, *FavoriteArticleRequest) (*ArticleResponse, error)
+	UnfavoriteArticle(context.Context, *UnfavoriteArticleRequest) (*ArticleResponse, error)
 }
 
 // UnimplementedArticlesServer can be embedded to have forward compatible implementations.
@@ -1249,6 +1332,9 @@ func (*UnimplementedArticlesServer) DeleteArticle(context.Context, *DeleteArticl
 }
 func (*UnimplementedArticlesServer) FavoriteArticle(context.Context, *FavoriteArticleRequest) (*ArticleResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FavoriteArticle not implemented")
+}
+func (*UnimplementedArticlesServer) UnfavoriteArticle(context.Context, *UnfavoriteArticleRequest) (*ArticleResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UnfavoriteArticle not implemented")
 }
 
 func RegisterArticlesServer(s *grpc.Server, srv ArticlesServer) {
@@ -1381,6 +1467,24 @@ func _Articles_FavoriteArticle_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Articles_UnfavoriteArticle_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UnfavoriteArticleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArticlesServer).UnfavoriteArticle(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/profile.Articles/UnfavoriteArticle",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArticlesServer).UnfavoriteArticle(ctx, req.(*UnfavoriteArticleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Articles_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "profile.Articles",
 	HandlerType: (*ArticlesServer)(nil),
@@ -1412,6 +1516,10 @@ var _Articles_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "FavoriteArticle",
 			Handler:    _Articles_FavoriteArticle_Handler,
+		},
+		{
+			MethodName: "UnfavoriteArticle",
+			Handler:    _Articles_UnfavoriteArticle_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

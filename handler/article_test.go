@@ -813,6 +813,12 @@ func TestFavoriteArticle(t *testing.T) {
 			},
 			false,
 		},
+		{
+			"favorite arleady favorited article: failed",
+			&barUser,
+			nil,
+			true,
+		},
 	}
 
 	var favoritesCount int64
@@ -841,5 +847,96 @@ func TestFavoriteArticle(t *testing.T) {
 		got := resp.GetArticle()
 		assert.True(t, got.GetFavorited())
 		assert.Equal(t, favoritesCount, got.GetFavoritesCount())
+	}
+}
+
+func TestUnfavoriteArticle(t *testing.T) {
+	h, cleaner := setUp(t)
+	defer cleaner(t)
+
+	fooUser := model.User{
+		Username: "foo",
+		Email:    "foo@example.com",
+		Password: "secret",
+	}
+
+	barUser := model.User{
+		Username: "bar",
+		Email:    "bar@example.com",
+		Password: "secret",
+	}
+
+	for _, u := range []*model.User{&fooUser, &barUser} {
+		if err := h.us.Create(u); err != nil {
+			t.Fatalf("failed to create initial user record: %v", err)
+		}
+	}
+
+	af := model.Article{
+		Title:       "original title",
+		Description: "original desc",
+		Body:        "original body",
+		Author:      fooUser,
+		Tags:        []model.Tag{model.Tag{Name: "hoge"}},
+	}
+
+	for _, a := range []*model.Article{&af} {
+		if err := h.as.Create(a); err != nil {
+			t.Fatalf("failed to create initial article record: %v", err)
+		}
+		if err := h.as.AddFavorite(&af, &fooUser); err != nil {
+			t.Fatalf("failed to create initial favorite articles: %v", err)
+		}
+	}
+
+	tests := []struct {
+		title          string
+		reqUser        *model.User
+		req            *pb.UnfavoriteArticleRequest
+		favoritesCount int64
+		hasError       bool
+	}{
+		{
+			"unfavorite article: success",
+			&fooUser,
+			&pb.UnfavoriteArticleRequest{
+				Slug: fmt.Sprintf("%d", af.ID),
+			},
+			0,
+			false,
+		},
+		{
+			"unfavorite not favorited article: failed",
+			&barUser,
+			nil,
+			0,
+			true,
+		},
+	}
+
+	for _, tt := range tests {
+		token, err := auth.GenerateToken(tt.reqUser.ID)
+		if err != nil {
+			t.Error(err)
+		}
+
+		ctx := ctxWithToken(context.Background(), token)
+		resp, err := h.UnfavoriteArticle(ctx, tt.req)
+		if tt.hasError {
+			if err == nil {
+				t.Errorf("%q expected to fail, but succeeded.", tt.title)
+				t.FailNow()
+			}
+			continue
+		}
+
+		if !tt.hasError && err != nil {
+			t.Errorf("%q expected to succeed, but failed. %v", tt.title, err)
+			t.FailNow()
+		}
+
+		got := resp.GetArticle()
+		assert.False(t, got.GetFavorited())
+		assert.Equal(t, tt.favoritesCount, got.GetFavoritesCount())
 	}
 }
