@@ -84,3 +84,27 @@ func (s *ArticleStore) GetFeedArticles(userIDs []uint, limit, offset int64) ([]m
 func (s *ArticleStore) Delete(m *model.Article) error {
 	return s.db.Delete(m).Error
 }
+
+// AddFavorite add a favorite user to an article
+func (s *ArticleStore) AddFavorite(a *model.Article, u *model.User) error {
+	tx := s.db.Begin()
+
+	err := tx.Model(a).Association("FavoritedUsers").
+		Append(u).Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	err = tx.Model(a).
+		Update("favorites_count", gorm.Expr("favorites_count + ?", 1)).Error
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	tx.Commit()
+	a.FavoritesCount++
+
+	return nil
+}

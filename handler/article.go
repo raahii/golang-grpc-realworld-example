@@ -357,5 +357,55 @@ func (h *Handler) DeleteArticle(ctx context.Context, req *pb.DeleteArticleReques
 
 // FavoriteArticle add an article to user favorites
 func (h *Handler) FavoriteArticle(ctx context.Context, req *pb.FavoriteArticleRequest) (*pb.ArticleResponse, error) {
-	return &pb.ArticleResponse{}, nil
+	h.logger.Info().Msgf("Delete artcile | req: %+v\n", req)
+
+	userID, err := auth.GetUserID(ctx)
+	if err != nil {
+		msg := "unauthenticated"
+		h.logger.Error().Err(err).Msg(msg)
+		return nil, status.Errorf(codes.Unauthenticated, msg)
+	}
+
+	currentUser, err := h.us.GetByID(userID)
+	if err != nil {
+		msg := "not user found"
+		err = fmt.Errorf("token is valid but the user not found: %w", err)
+		h.logger.Error().Err(err).Msg(msg)
+		return nil, status.Error(codes.NotFound, msg)
+	}
+
+	slug := req.GetSlug()
+	articleID, err := strconv.Atoi(slug)
+	if err != nil {
+		msg := fmt.Sprintf("cannot convert slug (%s) into integer", slug)
+		h.logger.Error().Err(err).Msg(msg)
+		return nil, status.Error(codes.InvalidArgument, "invalid article id")
+	}
+
+	article, err := h.as.GetByID(uint(articleID))
+	if err != nil {
+		msg := fmt.Sprintf("requested article (slug=%d) not found", articleID)
+		h.logger.Error().Err(err).Msg(msg)
+		pp.Println(err)
+		return nil, status.Error(codes.InvalidArgument, "invalid article id")
+	}
+
+	err = h.as.AddFavorite(article, currentUser)
+	if err != nil {
+		h.logger.Error().Err(err).Msg("failed to add favorite")
+		pp.Println(err)
+		return nil, status.Error(codes.Aborted, "internal server error")
+	}
+
+	// get whether current user follows article author
+	pa := article.ProtoArticle(true)
+	following, err := h.us.IsFollowing(currentUser, &article.Author)
+	if err != nil {
+		msg := "failed to get following status"
+		h.logger.Error().Err(err).Msg(msg)
+		return nil, status.Error(codes.NotFound, "internal server error")
+	}
+	pa.Author = article.Author.ProtoProfile(following)
+
+	return &pb.ArticleResponse{Article: pa}, nil
 }

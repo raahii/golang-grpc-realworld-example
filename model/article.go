@@ -18,6 +18,7 @@ type Article struct {
 	Tags           []Tag  `gorm:"many2many:article_tags"`
 	Author         User   `gorm:"foreignkey:UserID"`
 	UserID         uint   `gorm:"not null"`
+	FavoritesCount int64  `gorm:"not null;default=0"`
 	FavoritedUsers []User `gorm:"many2many:favorite_articles"`
 }
 
@@ -99,11 +100,12 @@ func (a *Article) BindTo(pa *pb.Article, requestUser *User, db *gorm.DB) error {
 // ProtoArticle generates proto aritcle model from article
 func (a *Article) ProtoArticle(favorited bool) *pb.Article {
 	pa := pb.Article{
-		Slug:        fmt.Sprintf("%d", a.ID),
-		Title:       a.Title,
-		Description: a.Description,
-		Body:        a.Body,
-		Favorited:   favorited,
+		Slug:           fmt.Sprintf("%d", a.ID),
+		Title:          a.Title,
+		Description:    a.Description,
+		Body:           a.Body,
+		FavoritesCount: a.FavoritesCount,
+		Favorited:      favorited,
 	}
 
 	// article tags
