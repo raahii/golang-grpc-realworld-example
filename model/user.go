@@ -7,6 +7,7 @@ import (
 	validation "github.com/go-ozzo/ozzo-validation"
 	"github.com/go-ozzo/ozzo-validation/is"
 	"github.com/jinzhu/gorm"
+	pb "github.com/raahii/golang-grpc-realworld-example/proto"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -62,4 +63,25 @@ func (u *User) HashPassword() error {
 func (u *User) CheckPassword(plain string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(plain))
 	return err == nil
+}
+
+// ProtoUser generates proto user model from user
+func (u *User) ProtoUser(token string) *pb.User {
+	return &pb.User{
+		Email:    u.Email,
+		Token:    token,
+		Username: u.Username,
+		Bio:      u.Bio,
+		Image:    u.Image,
+	}
+}
+
+// ProtoProfile generates proto profile model from user
+func (u *User) ProtoProfile(following bool) *pb.Profile {
+	return &pb.Profile{
+		Username:  u.Username,
+		Bio:       u.Bio,
+		Image:     u.Image,
+		Following: following,
+	}
 }

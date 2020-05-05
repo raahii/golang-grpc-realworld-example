@@ -40,14 +40,7 @@ func (h *Handler) ShowProfile(ctx context.Context, req *pb.ShowProfileRequest) (
 		return nil, status.Error(codes.NotFound, "internal server error")
 	}
 
-	p := pb.Profile{
-		Username:  requestUser.Username,
-		Bio:       requestUser.Bio,
-		Image:     requestUser.Image,
-		Following: following,
-	}
-
-	return &pb.ProfileResponse{Profile: &p}, nil
+	return &pb.ProfileResponse{Profile: requestUser.ProtoProfile(following)}, nil
 }
 
 // FollowUser follow a user
@@ -86,14 +79,7 @@ func (h *Handler) FollowUser(ctx context.Context, req *pb.FollowRequest) (*pb.Pr
 		return nil, status.Error(codes.Aborted, "failed to follow user")
 	}
 
-	p := pb.Profile{
-		Username:  requestUser.Username,
-		Bio:       requestUser.Bio,
-		Image:     requestUser.Image,
-		Following: true,
-	}
-
-	return &pb.ProfileResponse{Profile: &p}, nil
+	return &pb.ProfileResponse{Profile: requestUser.ProtoProfile(true)}, nil
 }
 
 // UnfollowUser unfollow a user
@@ -145,12 +131,5 @@ func (h *Handler) UnfollowUser(ctx context.Context, req *pb.UnfollowRequest) (*p
 		return nil, status.Error(codes.Aborted, "failed to unfollow user")
 	}
 
-	p := pb.Profile{
-		Username:  requestUser.Username,
-		Bio:       requestUser.Bio,
-		Image:     requestUser.Image,
-		Following: false,
-	}
-
-	return &pb.ProfileResponse{Profile: &p}, nil
+	return &pb.ProfileResponse{Profile: requestUser.ProtoProfile(false)}, nil
 }

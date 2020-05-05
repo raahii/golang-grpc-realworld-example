@@ -37,15 +37,7 @@ func (h *Handler) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (*pb.
 		return nil, status.Error(codes.Aborted, msg)
 	}
 
-	return &pb.UserResponse{
-		User: &pb.User{
-			Email:    u.Email,
-			Token:    token,
-			Username: u.Username,
-			Bio:      u.Bio,
-			Image:    u.Image,
-		},
-	}, nil
+	return &pb.UserResponse{User: u.ProtoUser(token)}, nil
 }
 
 // CreateUser registers a new user
@@ -90,15 +82,7 @@ func (h *Handler) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*p
 		return nil, status.Error(codes.Aborted, msg)
 	}
 
-	return &pb.UserResponse{
-		User: &pb.User{
-			Email:    u.Email,
-			Token:    token,
-			Username: u.Username,
-			Bio:      u.Bio,
-			Image:    u.Image,
-		},
-	}, nil
+	return &pb.UserResponse{User: u.ProtoUser(token)}, nil
 }
 
 // CurrentUser gets a current user
@@ -128,15 +112,7 @@ func (h *Handler) CurrentUser(ctx context.Context, req *empty.Empty) (*pb.UserRe
 		return nil, status.Error(codes.Aborted, msg)
 	}
 
-	return &pb.UserResponse{
-		User: &pb.User{
-			Email:    u.Email,
-			Token:    token,
-			Username: u.Username,
-			Bio:      u.Bio,
-			Image:    u.Image,
-		},
-	}, nil
+	return &pb.UserResponse{User: u.ProtoUser(token)}, nil
 }
 
 // UpdateUser updates current user
@@ -218,13 +194,5 @@ func (h *Handler) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*p
 		return nil, status.Error(codes.Aborted, msg)
 	}
 
-	return &pb.UserResponse{
-		User: &pb.User{
-			Email:    u.Email,
-			Token:    token,
-			Username: u.Username,
-			Bio:      u.Bio,
-			Image:    u.Image,
-		},
-	}, nil
+	return &pb.UserResponse{User: u.ProtoUser(token)}, nil
 }
