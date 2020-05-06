@@ -72,3 +72,8 @@ func (h *Handler) CreateComment(ctx context.Context, req *pb.CreateCommentReques
 
 	return &pb.CommentResponse{Comment: pc}, nil
 }
+
+// GetComments gets comments of the article
+func (h *Handler) GetComments(ctx context.Context, req *pb.GetCommentsRequest) (*pb.CommentsResponse, error) {
+	return &pb.CommentsResponse{Comments: []*pb.Comment{}}, nil
+}

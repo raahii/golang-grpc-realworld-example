@@ -214,6 +214,34 @@
       }
     },
     "/articles/{slug}/comments": {
+      "get": {
+        "operationId": "GetComments",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/profileCommentsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Articles"
+        ]
+      },
       "post": {
         "operationId": "CreateComment",
         "responses": {
@@ -424,6 +452,17 @@
       "properties": {
         "comment": {
           "$ref": "#/definitions/profileComment"
+        }
+      }
+    },
+    "profileCommentsResponse": {
+      "type": "object",
+      "properties": {
+        "comments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/profileComment"
+          }
         }
       }
     },
