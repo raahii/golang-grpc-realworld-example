@@ -287,6 +287,42 @@ func TestDeleteComment(t *testing.T) {
 		hasError bool
 	}{
 		{
+			"delete comment from unauthenticated user: failed",
+			nil,
+			&pb.DeleteCommentRequest{
+				Slug: fmt.Sprintf("%d", awesomeArticle.ID),
+				Id:   fmt.Sprintf("%d", comment.ID),
+			},
+			true,
+		},
+		{
+			"delete comment from other user: failed",
+			&fooUser,
+			&pb.DeleteCommentRequest{
+				Slug: fmt.Sprintf("%d", awesomeArticle.ID),
+				Id:   fmt.Sprintf("%d", comment.ID),
+			},
+			true,
+		},
+		{
+			"delete comment with invalid article id: failed",
+			&fooUser,
+			&pb.DeleteCommentRequest{
+				Slug: "123124",
+				Id:   fmt.Sprintf("%d", comment.ID),
+			},
+			true,
+		},
+		{
+			"delete comment with invalid comment id: failed",
+			&fooUser,
+			&pb.DeleteCommentRequest{
+				Slug: fmt.Sprintf("%d", awesomeArticle.ID),
+				Id:   "123456",
+			},
+			true,
+		},
+		{
 			"delete comment: success",
 			&barUser,
 			&pb.DeleteCommentRequest{

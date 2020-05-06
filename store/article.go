@@ -189,3 +189,18 @@ func (s *ArticleStore) GetComments(m *model.Article) ([]model.Comment, error) {
 	}
 	return cs, nil
 }
+
+// GetCommentByID finds an comment from id
+func (s *ArticleStore) GetCommentByID(id uint) (*model.Comment, error) {
+	var m model.Comment
+	err := s.db.Find(&m, id).Error
+	if err != nil {
+		return nil, err
+	}
+	return &m, nil
+}
+
+// DeleteComment deletes an comment
+func (s *ArticleStore) DeleteComment(m *model.Comment) error {
+	return s.db.Delete(m).Error
+}

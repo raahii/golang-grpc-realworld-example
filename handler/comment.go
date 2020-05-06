@@ -135,5 +135,51 @@ func (h *Handler) GetComments(ctx context.Context, req *pb.GetCommentsRequest) (
 func (h *Handler) DeleteComment(ctx context.Context, req *pb.DeleteCommentRequest) (*pb.Empty, error) {
 	h.logger.Info().Msgf("Delete comment | req: %+v\n", req)
 
+	// get current user
+	userID, err := auth.GetUserID(ctx)
+	if err != nil {
+		h.logger.Error().Err(err).Msg("unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
+	}
+
+	currentUser, err := h.us.GetByID(userID)
+	if err != nil {
+		h.logger.Error().Err(err).Msg("current user not found")
+		return nil, status.Error(codes.NotFound, "user not found")
+	}
+
+	commentID, err := strconv.Atoi(req.GetId())
+	if err != nil {
+		msg := fmt.Sprintf("cannot convert id (%s) into integer", req.GetId())
+		h.logger.Error().Err(err).Msg(msg)
+		return nil, status.Error(codes.InvalidArgument, "invalid article id")
+	}
+
+	comment, err := h.as.GetCommentByID(uint(commentID))
+	if err != nil {
+		msg := "failed to get comment"
+		h.logger.Error().Err(err).Msg(msg)
+		return nil, status.Error(codes.InvalidArgument, msg)
+	}
+
+	if req.GetSlug() != fmt.Sprintf("%d", comment.ArticleID) {
+		msg := "the comment is not in the article"
+		h.logger.Error().Err(err).Msg(msg)
+		return nil, status.Error(codes.InvalidArgument, msg)
+	}
+
+	if comment.UserID != currentUser.ID {
+		msg := "forbidden"
+		h.logger.Error().Err(err).Msg(msg)
+		return nil, status.Error(codes.InvalidArgument, msg)
+	}
+
+	err = h.as.DeleteComment(comment)
+	if err != nil {
+		msg := "failed to delete comment"
+		h.logger.Error().Err(err).Msg(msg)
+		return nil, status.Error(codes.InvalidArgument, msg)
+	}
+
 	return &pb.Empty{}, nil
 }
