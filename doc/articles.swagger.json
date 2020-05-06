@@ -213,6 +213,44 @@
         ]
       }
     },
+    "/articles/{slug}/comments": {
+      "post": {
+        "operationId": "CreateComment",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/profileCommentResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/profileCreateCommentRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Articles"
+        ]
+      }
+    },
     "/articles/{slug}/favorite": {
       "delete": {
         "operationId": "UnfavoriteArticle",
@@ -359,6 +397,36 @@
         }
       }
     },
+    "profileComment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "body": {
+          "type": "string"
+        },
+        "author": {
+          "$ref": "#/definitions/profileProfile"
+        }
+      }
+    },
+    "profileCommentResponse": {
+      "type": "object",
+      "properties": {
+        "comment": {
+          "$ref": "#/definitions/profileComment"
+        }
+      }
+    },
     "profileCreateAritcleRequestArticle": {
       "type": "object",
       "properties": {
@@ -376,6 +444,25 @@
           "items": {
             "type": "string"
           }
+        }
+      }
+    },
+    "profileCreateCommentRequest": {
+      "type": "object",
+      "properties": {
+        "slug": {
+          "type": "string"
+        },
+        "comment": {
+          "$ref": "#/definitions/profileCreateCommentRequestComment"
+        }
+      }
+    },
+    "profileCreateCommentRequestComment": {
+      "type": "object",
+      "properties": {
+        "body": {
+          "type": "string"
         }
       }
     },

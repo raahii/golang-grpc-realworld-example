@@ -22,6 +22,14 @@ message Article {
   profile.Profile author = 10;
 }
 
+message Comment {
+  string id = 1;
+  google.protobuf.Timestamp createdAt = 2;
+  google.protobuf.Timestamp updatedAt = 3;
+  string body = 4;
+  profile.Profile author = 5;
+}
+
 
 service Articles {
   rpc CreateArticle (CreateAritcleRequest) returns (ArticleResponse) {
@@ -67,6 +75,12 @@ service Articles {
   rpc GetTags (empty.Empty) returns (TagsResponse) {
     option (google.api.http) = {
       get: "/tags"
+    };
+  }
+  rpc CreateComment (CreateCommentRequest) returns (CommentResponse) {
+    option (google.api.http) = {
+      post: "/articles/{slug}/comments"
+      body: "*"
     };
   }
 }
@@ -121,6 +135,15 @@ message UnfavoriteArticleRequest {
   string slug = 1;
 }
 
+message CreateCommentRequest {
+  string slug = 1;
+
+  message Comment {
+    string body = 1;
+  }
+  Comment comment =2;
+}
+
 message ArticleResponse {
   Article article = 1;
 }
@@ -131,4 +154,8 @@ message ArticlesResponse {
 
 message TagsResponse {
   repeated string tags = 1;
+}
+
+message CommentResponse {
+  Comment comment = 1;
 }
