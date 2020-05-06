@@ -163,3 +163,12 @@ func (s *ArticleStore) DeleteFavorite(a *model.Article, u *model.User) error {
 
 	return nil
 }
+
+// GetTags creates a article tag
+func (s *ArticleStore) GetTags() ([]model.Tag, error) {
+	var tags []model.Tag
+	if err := s.db.Find(&tags).Error; err != nil {
+		return tags, err
+	}
+	return tags, nil
+}

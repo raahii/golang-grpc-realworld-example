@@ -8,7 +8,15 @@
 
 > ### Go/GRPC codebase containing RealWorld examples (CRUD, auth, advanced patterns, etc) that adheres to the [RealWorld](https://github.com/gothinkster/realworld) spec and API.
 
+### [Demo](https://github.com/gothinkster/realworld)&nbsp;&nbsp;&nbsp;&nbsp;[RealWorld](https://github.com/gothinkster/realworld)
+
 This codebase was created to demonstrate a fully fledged fullstack application built with golang/grpc including CRUD operations, authentication, routing, pagination, and more.
+
+
+
+## How it works
+
+
 
 
 
@@ -25,7 +33,7 @@ The app listens and serves on `0.0.0.0:8080`.
 
   
 
-- locally
+- local
 
   - Install Go 1.13+, MySQL
   - set environment variables to connect database [like this](https://github.com/raahii/golang-grpc-realworld-example/blob/master/env/local.env).
@@ -47,10 +55,27 @@ The app listens and serves on `0.0.0.0:8080`.
 
 
 
-- locally
+- local
 
   ```
   $ go test ./...
   ```
 
-  
+
+
+
+## TODOs
+
+- [x] Users and Authentication
+  - [x] `POST /user/login`: Existing user login
+  - [x] `POST /users`: Register a new user
+  - [x] `GET /users`: Get current user
+  - [x] `PUT /users`: Update current user
+
+- [x] Profiles
+  - [x] `GET /profiles/{username}`: Get a profile
+  - [x] `POST /profiles/{username}/follow`: Follow a user
+  - [x] `DELETE /profiles/{username}/follow`: Unfollow a user
+
+- [ ] Articles
+  - [ ] 

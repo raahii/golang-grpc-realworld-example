@@ -64,6 +64,11 @@ service Articles {
       delete: "/articles/{slug}/favorite"
     };
   }
+  rpc GetTags (empty.Empty) returns (TagsResponse) {
+    option (google.api.http) = {
+      get: "/tags"
+    };
+  }
 }
 
 message CreateAritcleRequest {
@@ -122,4 +127,8 @@ message ArticleResponse {
 
 message ArticlesResponse {
   repeated Article articles = 1;
+}
+
+message TagsResponse {
+  repeated string tags = 1;
 }

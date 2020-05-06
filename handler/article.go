@@ -485,3 +485,21 @@ func (h *Handler) UnfavoriteArticle(ctx context.Context, req *pb.UnfavoriteArtic
 
 	return &pb.ArticleResponse{Article: pa}, nil
 }
+
+// GetTags returns all of tags
+func (h *Handler) GetTags(ctx context.Context, req *pb.Empty) (*pb.TagsResponse, error) {
+	h.logger.Info().Msg("get tags")
+
+	tags, err := h.as.GetTags()
+	if err != nil {
+		h.logger.Error().Err(err).Msg("faield to get tags")
+		return nil, status.Error(codes.Aborted, "internal server error")
+	}
+
+	tagNames := make([]string, 0, len(tags))
+	for _, t := range tags {
+		tagNames = append(tagNames, t.Name)
+	}
+
+	return &pb.TagsResponse{Tags: tagNames}, nil
+}

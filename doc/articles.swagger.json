@@ -270,6 +270,28 @@
           "Articles"
         ]
       }
+    },
+    "/tags": {
+      "get": {
+        "operationId": "GetTags",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/profileTagsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "tags": [
+          "Articles"
+        ]
+      }
     }
   },
   "definitions": {
@@ -372,6 +394,17 @@
         "following": {
           "type": "boolean",
           "format": "boolean"
+        }
+      }
+    },
+    "profileTagsResponse": {
+      "type": "object",
+      "properties": {
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
