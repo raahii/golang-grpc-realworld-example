@@ -1,12 +1,12 @@
 syntax = "proto3";
 
-package profile;
+package article;
 
 option go_package = ".;proto";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
-import "profiles.proto";
+import "user.proto";
 import "empty.proto";
 
 message Article {
@@ -19,7 +19,7 @@ message Article {
   google.protobuf.Timestamp updatedAt = 7;
   bool favorited = 8;
   int64 favoritesCount = 9;
-  profile.Profile author = 10;
+  user.Profile author = 10;
 }
 
 message Comment {
@@ -27,7 +27,7 @@ message Comment {
   google.protobuf.Timestamp createdAt = 2;
   google.protobuf.Timestamp updatedAt = 3;
   string body = 4;
-  profile.Profile author = 5;
+  user.Profile author = 5;
 }
 
 

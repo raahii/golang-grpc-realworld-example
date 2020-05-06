@@ -30,13 +30,7 @@ func run() error {
 	opts := []grpc.DialOption{grpc.WithInsecure()}
 
 	// users
-	err = gw.RegisterUsersHandlerFromEndpoint(ctx, mux, *echoEndpoint, opts)
-	if err != nil {
-		return err
-	}
-
-	// profiles
-	err = gw.RegisterProfilesHandlerFromEndpoint(ctx, mux, *echoEndpoint, opts)
+	err := gw.RegisterUsersHandlerFromEndpoint(ctx, mux, *echoEndpoint, opts)
 	if err != nil {
 		return err
 	}

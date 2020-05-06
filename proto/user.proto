@@ -1,11 +1,26 @@
 syntax = "proto3";
 
-package profile;
+package user;
 
 option go_package = ".;proto";
 
 import "google/api/annotations.proto";
 import "empty.proto";
+
+message User {
+  string email = 1;
+  string token = 2;
+  string username = 3;
+  string bio = 4;
+  string image = 5;
+}
+
+message Profile {
+  string username = 1;
+  string bio = 2;
+  string image = 3;
+  bool following = 4;
+}
 
 service Users {
   rpc LoginUser (LoginUserRequest) returns (UserResponse) {
@@ -33,16 +48,25 @@ service Users {
       put: "/users"
     };
   }
+
+  rpc ShowProfile (ShowProfileRequest) returns (ProfileResponse) {
+    option (google.api.http) = {
+      get: "/profiles/{username}"
+    };
+  }
+  rpc FollowUser (FollowRequest) returns (ProfileResponse) {
+    option (google.api.http) = {
+      post: "/profiles/{username}"
+    };
+  }
+  rpc UnfollowUser (UnfollowRequest) returns (ProfileResponse) {
+    option (google.api.http) = {
+      delete: "/profiles/{username}"
+    };
+  }
 }
 
-message User {
-  string email = 1;
-  string token = 2;
-  string username = 3;
-  string bio = 4;
-  string image = 5;
-}
-
+/* request message */
 message LoginUserRequest {
   message User {
     string email = 1;
@@ -71,6 +95,23 @@ message UpdateUserRequest {
   User user = 1;
 }
 
+message ShowProfileRequest {
+  string username = 1;
+}
+
+message FollowRequest {
+  string username = 1;
+}
+
+message UnfollowRequest {
+  string username = 1;
+}
+
+/* response message */
 message UserResponse {
   User user = 1;
+}
+
+message ProfileResponse {
+  Profile profile = 1;
 }
