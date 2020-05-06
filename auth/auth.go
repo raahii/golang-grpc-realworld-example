@@ -4,13 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 )
 
-var jwtSecret = []byte("!!SECRET!!")
+var jwtSecret = []byte(os.Getenv("JWT_SECRET"))
 
 type claims struct {
 	UserID uint `json:"user_id"`
