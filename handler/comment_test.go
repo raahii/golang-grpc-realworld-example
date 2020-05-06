@@ -231,3 +231,95 @@ func TestGetComments(t *testing.T) {
 		}
 	}
 }
+
+func TestDeleteComment(t *testing.T) {
+	h, cleaner := setUp(t)
+	defer cleaner(t)
+
+	// create user
+	fooUser := model.User{
+		Username: "foo",
+		Email:    "foo@example.com",
+		Password: "secret",
+	}
+
+	barUser := model.User{
+		Username: "bar",
+		Email:    "bar@example.com",
+		Password: "secret",
+	}
+
+	for _, u := range []*model.User{&fooUser, &barUser} {
+		if err := h.us.Create(u); err != nil {
+			t.Fatalf("failed to create initial user record: %v", err)
+		}
+	}
+
+	// create article
+	awesomeArticle := model.Article{
+		Title:       "awesome post!",
+		Description: "awesome description!",
+		Body:        "awesome content!",
+		Tags:        []model.Tag{model.Tag{Name: "hoge"}},
+		Author:      fooUser,
+	}
+
+	for _, a := range []*model.Article{&awesomeArticle} {
+		if err := h.as.Create(a); err != nil {
+			t.Fatalf("failed to create initial article record: %v", err)
+		}
+	}
+
+	// comment articles
+	comment := model.Comment{
+		Body:      "f***",
+		Author:    barUser,
+		ArticleID: awesomeArticle.ID,
+	}
+	if err := h.as.CreateComment(&comment); err != nil {
+		t.Fatalf("failed to create initial article comment: %v", err)
+	}
+
+	tests := []struct {
+		title    string
+		reqUser  *model.User
+		req      *pb.DeleteCommentRequest
+		hasError bool
+	}{
+		{
+			"delete comment: success",
+			&barUser,
+			&pb.DeleteCommentRequest{
+				Slug: fmt.Sprintf("%d", awesomeArticle.ID),
+				Id:   fmt.Sprintf("%d", comment.ID),
+			},
+			false,
+		},
+	}
+
+	for _, tt := range tests {
+		ctx := context.Background()
+		if tt.reqUser != nil {
+			token, err := auth.GenerateToken(tt.reqUser.ID)
+			if err != nil {
+				t.Error(err)
+			}
+
+			ctx = ctxWithToken(ctx, token)
+		}
+
+		_, err := h.DeleteComment(ctx, tt.req)
+		if tt.hasError {
+			if err == nil {
+				t.Errorf("%q expected to fail, but succeeded.", tt.title)
+				t.FailNow()
+			}
+			continue
+		}
+
+		if !tt.hasError && err != nil {
+			t.Errorf("%q expected to succeed, but failed. %v", tt.title, err)
+			t.FailNow()
+		}
+	}
+}

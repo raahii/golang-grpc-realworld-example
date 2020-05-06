@@ -130,3 +130,10 @@ func (h *Handler) GetComments(ctx context.Context, req *pb.GetCommentsRequest) (
 
 	return &pb.CommentsResponse{Comments: pcs}, nil
 }
+
+// DeleteComment delete a commnet of the article
+func (h *Handler) DeleteComment(ctx context.Context, req *pb.DeleteCommentRequest) (*pb.Empty, error) {
+	h.logger.Info().Msgf("Delete comment | req: %+v\n", req)
+
+	return &pb.Empty{}, nil
+}

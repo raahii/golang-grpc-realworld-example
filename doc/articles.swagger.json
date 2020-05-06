@@ -279,6 +279,42 @@
         ]
       }
     },
+    "/articles/{slug}/comments/{id}": {
+      "get": {
+        "operationId": "DeleteComment",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/emptyEmpty"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response",
+            "schema": {
+              "$ref": "#/definitions/runtimeError"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "Articles"
+        ]
+      }
+    },
     "/articles/{slug}/favorite": {
       "delete": {
         "operationId": "UnfavoriteArticle",
@@ -412,7 +448,8 @@
         "article": {
           "$ref": "#/definitions/profileArticle"
         }
-      }
+      },
+      "title": "response message"
     },
     "profileArticlesResponse": {
       "type": "object",

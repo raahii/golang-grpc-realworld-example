@@ -88,8 +88,14 @@ service Articles {
       get: "/articles/{slug}/comments"
     };
   }
+  rpc DeleteComment (DeleteCommentRequest) returns (empty.Empty) {
+    option (google.api.http) = {
+      get: "/articles/{slug}/comments/{id}"
+    };
+  }
 }
 
+/* request message */
 message CreateAritcleRequest {
   message Article {
     string title = 2;
@@ -153,6 +159,12 @@ message GetCommentsRequest {
   string slug = 1;
 }
 
+message DeleteCommentRequest {
+  string slug = 1;
+  string id = 2;
+}
+
+/* response message */
 message ArticleResponse {
   Article article = 1;
 }
