@@ -16,9 +16,21 @@ This codebase was created to demonstrate a fully fledged fullstack application b
 
 ## How it works
 
+![figure](https://user-images.githubusercontent.com/13511520/81163457-bff62700-8fc9-11ea-897a-60f27d9f9c8b.png)
 
 
+- Using [grpc-gateway](https://grpc-ecosystem.github.io/grpc-gateway/) as reverse-proxy server which translates a **RESTful JSON API into gRPC**.
 
+- Using **Go** to implement realworld backend server.
+
+  - grpc: [grpc-go](https://github.com/grpc/grpc-go)
+  - auth token: [jwt-go](https://github.com/dgrijalva/jwt-go)
+  - ORM: [gorm](https://github.com/jinzhu/gorm)
+  - logging: [zerolog](https://github.com/rs/zerolog)
+
+- Using **MySQL** to store data.
+
+  
 
 ## Getting started
 
