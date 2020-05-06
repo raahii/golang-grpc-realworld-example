@@ -45,7 +45,6 @@ func main() {
 	}
 
 	s := grpc.NewServer()
-	pb.RegisterGreeterServer(s, h)
 	pb.RegisterUsersServer(s, h)
 	pb.RegisterProfilesServer(s, h)
 	pb.RegisterArticlesServer(s, h)

@@ -29,12 +29,6 @@ func run() error {
 	mux := runtime.NewServeMux(ropts...)
 	opts := []grpc.DialOption{grpc.WithInsecure()}
 
-	// greeter
-	err := gw.RegisterGreeterHandlerFromEndpoint(ctx, mux, *echoEndpoint, opts)
-	if err != nil {
-		return err
-	}
-
 	// users
 	err = gw.RegisterUsersHandlerFromEndpoint(ctx, mux, *echoEndpoint, opts)
 	if err != nil {
@@ -43,6 +37,12 @@ func run() error {
 
 	// profiles
 	err = gw.RegisterProfilesHandlerFromEndpoint(ctx, mux, *echoEndpoint, opts)
+	if err != nil {
+		return err
+	}
+
+	// ariticles
+	err = gw.RegisterArticlesHandlerFromEndpoint(ctx, mux, *echoEndpoint, opts)
 	if err != nil {
 		return err
 	}

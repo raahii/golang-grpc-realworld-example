@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/raahii/golang-grpc-realworld-example/auth"
 	"github.com/raahii/golang-grpc-realworld-example/model"
 	pb "github.com/raahii/golang-grpc-realworld-example/proto"
@@ -86,7 +85,7 @@ func (h *Handler) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*p
 }
 
 // CurrentUser gets a current user
-func (h *Handler) CurrentUser(ctx context.Context, req *empty.Empty) (*pb.UserResponse, error) {
+func (h *Handler) CurrentUser(ctx context.Context, req *pb.Empty) (*pb.UserResponse, error) {
 	h.logger.Info().Msg("get current user")
 
 	userID, err := auth.GetUserID(ctx)

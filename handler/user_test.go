@@ -5,7 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/ptypes/empty"
 	"github.com/raahii/golang-grpc-realworld-example/auth"
 	"github.com/raahii/golang-grpc-realworld-example/model"
 	pb "github.com/raahii/golang-grpc-realworld-example/proto"
@@ -264,7 +263,7 @@ func TestCurrentUser(t *testing.T) {
 		}
 
 		ctx := ctxWithToken(context.Background(), token)
-		resp, err := h.CurrentUser(ctx, &empty.Empty{})
+		resp, err := h.CurrentUser(ctx, &pb.Empty{})
 		if (err != nil) != tt.hasError {
 			t.Errorf("%q hasError %t, but got error: %v.", tt.title, tt.hasError, err)
 			t.FailNow()

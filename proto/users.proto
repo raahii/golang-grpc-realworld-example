@@ -5,7 +5,7 @@ package profile;
 option go_package = ".;proto";
 
 import "google/api/annotations.proto";
-import "google/protobuf/empty.proto";
+import "empty.proto";
 
 service Users {
   rpc LoginUser (LoginUserRequest) returns (UserResponse) {
@@ -22,7 +22,7 @@ service Users {
     };
   }
 
-  rpc CurrentUser (google.protobuf.Empty) returns (UserResponse) {
+  rpc CurrentUser (empty.Empty) returns (UserResponse) {
     option (google.api.http) = {
       get: "/users"
     };
