@@ -75,5 +75,58 @@ func (h *Handler) CreateComment(ctx context.Context, req *pb.CreateCommentReques
 
 // GetComments gets comments of the article
 func (h *Handler) GetComments(ctx context.Context, req *pb.GetCommentsRequest) (*pb.CommentsResponse, error) {
-	return &pb.CommentsResponse{Comments: []*pb.Comment{}}, nil
+	h.logger.Info().Msgf("Get comments | req: %+v\n", req)
+
+	// get article
+	articleID, err := strconv.Atoi(req.GetSlug())
+	if err != nil {
+		msg := fmt.Sprintf("cannot convert slug (%s) into integer", req.GetSlug())
+		h.logger.Error().Err(err).Msg(msg)
+		return nil, status.Error(codes.InvalidArgument, "invalid article id")
+	}
+
+	article, err := h.as.GetByID(uint(articleID))
+	if err != nil {
+		msg := fmt.Sprintf("requested article (slug=%d) not found", articleID)
+		h.logger.Error().Err(err).Msg(msg)
+		return nil, status.Error(codes.InvalidArgument, "invalid article id")
+	}
+
+	comments, err := h.as.GetComments(article)
+	if err != nil {
+		msg := "failed to get comments"
+		h.logger.Error().Err(err).Msg(msg)
+		return nil, status.Error(codes.Aborted, msg)
+	}
+
+	// get current user
+	userID, err := auth.GetUserID(ctx)
+	if err != nil {
+		h.logger.Error().Err(err).Msg("unauthenticated")
+		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
+	}
+
+	currentUser, err := h.us.GetByID(userID)
+	if err != nil {
+		h.logger.Error().Err(err).Msg("current user not found")
+		return nil, status.Error(codes.NotFound, "user not found")
+	}
+
+	pcs := make([]*pb.Comment, 0, len(comments))
+	for _, c := range comments {
+		pc := c.ProtoComment()
+
+		// get whether current user follows article author
+		following, err := h.us.IsFollowing(currentUser, &c.Author)
+		if err != nil {
+			msg := "failed to get following status"
+			h.logger.Error().Err(err).Msg(msg)
+			return nil, status.Error(codes.NotFound, "internal server error")
+		}
+		pc.Author = c.Author.ProtoProfile(following)
+
+		pcs = append(pcs, pc)
+	}
+
+	return &pb.CommentsResponse{Comments: pcs}, nil
 }

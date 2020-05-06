@@ -177,3 +177,15 @@ func (s *ArticleStore) GetTags() ([]model.Tag, error) {
 func (s *ArticleStore) CreateComment(m *model.Comment) error {
 	return s.db.Create(&m).Error
 }
+
+// GetComments gets coments of the article
+func (s *ArticleStore) GetComments(m *model.Article) ([]model.Comment, error) {
+	var cs []model.Comment
+	err := s.db.Preload("Author").
+		Where("article_id = ?", m.ID).
+		Find(&cs).Error
+	if err != nil {
+		return cs, err
+	}
+	return cs, nil
+}

@@ -172,8 +172,9 @@ func TestGetComments(t *testing.T) {
 			b = "pong"
 		}
 		c := model.Comment{
-			Body:   b,
-			Author: u,
+			Body:      b,
+			Author:    u,
+			ArticleID: awesomeArticle.ID,
 		}
 		if err := h.as.CreateComment(&c); err != nil {
 			t.Fatalf("failed to create initial article comments: %v", err)
@@ -225,8 +226,8 @@ func TestGetComments(t *testing.T) {
 
 		assert.Len(t, resp.GetComments(), len(comments))
 		for i, got := range resp.GetComments() {
-			assert.Equal(t, got.GetBody(), comments[i].Body)
-			assert.Equal(t, got.GetAuthor().GetUsername, comments[i].Author.Username)
+			assert.Equal(t, comments[i].Body, got.GetBody())
+			assert.Equal(t, comments[i].Author.Username, got.GetAuthor().GetUsername())
 		}
 	}
 }
