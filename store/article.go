@@ -172,3 +172,8 @@ func (s *ArticleStore) GetTags() ([]model.Tag, error) {
 	}
 	return tags, nil
 }
+
+// CreateComment creates a comment of the article
+func (s *ArticleStore) CreateComment(m *model.Comment) error {
+	return s.db.Create(&m).Error
+}

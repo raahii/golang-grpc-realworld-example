@@ -67,6 +67,12 @@ func TestCreateComment(t *testing.T) {
 			},
 			false,
 		},
+		{
+			"create comment from unauthenticated user: failed",
+			nil,
+			nil,
+			true,
+		},
 	}
 
 	for _, tt := range tests {

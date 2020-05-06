@@ -134,6 +134,7 @@ func AutoMigrate(db *gorm.DB) error {
 		&model.User{},
 		&model.Article{},
 		&model.Tag{},
+		&model.Comment{},
 	).Error
 	if err != nil {
 		return err

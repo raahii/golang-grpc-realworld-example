@@ -20,6 +20,7 @@ type Article struct {
 	UserID         uint   `gorm:"not null"`
 	FavoritesCount int64  `gorm:"not null;default=0"`
 	FavoritedUsers []User `gorm:"many2many:favorite_articles"`
+	Comments       []Comment
 }
 
 // Validate validates fields of article model
