@@ -11,5 +11,6 @@ proto:
 		--swagger_out=logtostderr=true:./doc \
 		./proto/*.proto
 
+.PHONY: test
 test:
 	go test -v ./handler -parallel 4

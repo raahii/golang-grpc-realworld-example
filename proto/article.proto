@@ -30,11 +30,11 @@ message Comment {
   user.Profile author = 5;
 }
 
-
 service Articles {
   rpc CreateArticle (CreateAritcleRequest) returns (ArticleResponse) {
     option (google.api.http) = {
       post: "/articles"
+      body: "*"
     };
   }
   rpc GetArticle (GetArticleRequest) returns (ArticleResponse) {
@@ -55,6 +55,7 @@ service Articles {
   rpc UpdateArticle (UpdateArticleRequest) returns (ArticleResponse) {
     option (google.api.http) = {
       put: "/articles/{article.slug}"
+      body: "*"
     };
   }
   rpc DeleteArticle (DeleteArticleRequest) returns (empty.Empty) {
@@ -65,6 +66,7 @@ service Articles {
   rpc FavoriteArticle (FavoriteArticleRequest) returns (ArticleResponse) {
     option (google.api.http) = {
       post: "/articles/{slug}/favorite"
+      body: "*"
     };
   }
   rpc UnfavoriteArticle (UnfavoriteArticleRequest) returns (ArticleResponse) {
@@ -98,10 +100,10 @@ service Articles {
 /* request message */
 message CreateAritcleRequest {
   message Article {
-    string title = 2;
-    string description = 3;
-    string body = 4;
-    repeated string tagList = 5;
+    string title = 1;
+    string description = 2;
+    string body = 3;
+    repeated string tagList = 4;
   }
 
   Article article = 1;

@@ -39,13 +39,14 @@ service Users {
 
   rpc CurrentUser (empty.Empty) returns (UserResponse) {
     option (google.api.http) = {
-      get: "/users"
+      get: "/user"
     };
   }
 
   rpc UpdateUser (UpdateUserRequest) returns (UserResponse) {
     option (google.api.http) = {
-      put: "/users"
+      put: "/user"
+      body: "*"
     };
   }
 
@@ -57,6 +58,7 @@ service Users {
   rpc FollowUser (FollowRequest) returns (ProfileResponse) {
     option (google.api.http) = {
       post: "/profiles/{username}"
+      body: "*"
     };
   }
   rpc UnfollowUser (UnfollowRequest) returns (ProfileResponse) {
