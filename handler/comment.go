@@ -14,7 +14,7 @@ import (
 
 // CreateComment create a comment for an article
 func (h *Handler) CreateComment(ctx context.Context, req *pb.CreateCommentRequest) (*pb.CommentResponse, error) {
-	h.logger.Info().Msgf("Create comment | req: %+v\n", req)
+	h.logger.Info().Msgf("Create comment | req: %+v", req)
 
 	// get current user
 	userID, err := auth.GetUserID(ctx)
@@ -75,7 +75,7 @@ func (h *Handler) CreateComment(ctx context.Context, req *pb.CreateCommentReques
 
 // GetComments gets comments of the article
 func (h *Handler) GetComments(ctx context.Context, req *pb.GetCommentsRequest) (*pb.CommentsResponse, error) {
-	h.logger.Info().Msgf("Get comments | req: %+v\n", req)
+	h.logger.Info().Msgf("Get comments | req: %+v", req)
 
 	// get article
 	articleID, err := strconv.Atoi(req.GetSlug())
@@ -99,17 +99,14 @@ func (h *Handler) GetComments(ctx context.Context, req *pb.GetCommentsRequest) (
 		return nil, status.Error(codes.Aborted, msg)
 	}
 
-	// get current user
+	var currentUser *model.User
 	userID, err := auth.GetUserID(ctx)
-	if err != nil {
-		h.logger.Error().Err(err).Msg("unauthenticated")
-		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
-	}
-
-	currentUser, err := h.us.GetByID(userID)
-	if err != nil {
-		h.logger.Error().Err(err).Msg("current user not found")
-		return nil, status.Error(codes.NotFound, "user not found")
+	if err == nil {
+		currentUser, err = h.us.GetByID(userID)
+		if err != nil {
+			h.logger.Error().Err(err).Msg("current user not found")
+			return nil, status.Error(codes.NotFound, "user not found")
+		}
 	}
 
 	pcs := make([]*pb.Comment, 0, len(comments))
@@ -133,7 +130,7 @@ func (h *Handler) GetComments(ctx context.Context, req *pb.GetCommentsRequest) (
 
 // DeleteComment delete a commnet of the article
 func (h *Handler) DeleteComment(ctx context.Context, req *pb.DeleteCommentRequest) (*pb.Empty, error) {
-	h.logger.Info().Msgf("Delete comment | req: %+v\n", req)
+	h.logger.Info().Msgf("Delete comment | req: %+v", req)
 
 	// get current user
 	userID, err := auth.GetUserID(ctx)

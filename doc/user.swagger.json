@@ -39,7 +39,9 @@
         "tags": [
           "Users"
         ]
-      },
+      }
+    },
+    "/profiles/{username}/follow": {
       "delete": {
         "operationId": "UnfollowUser",
         "responses": {

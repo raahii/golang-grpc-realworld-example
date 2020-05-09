@@ -57,7 +57,7 @@ func (h *Handler) CreateArticle(ctx context.Context, req *pb.CreateAritcleReques
 	}
 
 	// get whether the article is current user's favorite
-	favorited := false
+	favorited := true
 	pa := article.ProtoArticle(favorited)
 
 	// get whether current user follows article author
@@ -141,8 +141,9 @@ func (h *Handler) GetArticles(ctx context.Context, req *pb.GetArticlesRequest) (
 		var err error
 		favoritedBy, err = h.us.GetByUsername(req.GetFavorited())
 		if err != nil {
-			h.logger.Error().Err(err).Msg("failed to get user for favorited query")
-			return nil, status.Error(codes.InvalidArgument, "invalid favorited query")
+			// h.logger.Error().Err(err).Msg("failed to get user for favorited query")
+			// return nil, status.Error(codes.InvalidArgument, "invalid favorited query")
+			favoritedBy = nil
 		}
 	}
 
@@ -152,16 +153,14 @@ func (h *Handler) GetArticles(ctx context.Context, req *pb.GetArticlesRequest) (
 		return nil, status.Error(codes.Aborted, "internal server error")
 	}
 
+	var currentUser *model.User
 	userID, err := auth.GetUserID(ctx)
-	if err != nil {
-		h.logger.Error().Err(err).Msg("unauthenticated")
-		return nil, status.Errorf(codes.Unauthenticated, "unauthenticated")
-	}
-
-	currentUser, err := h.us.GetByID(userID)
-	if err != nil {
-		h.logger.Error().Err(err).Msg("current user not found")
-		return nil, status.Error(codes.NotFound, "user not found")
+	if err == nil {
+		currentUser, err = h.us.GetByID(userID)
+		if err != nil {
+			h.logger.Error().Err(err).Msg("current user not found")
+			return nil, status.Error(codes.NotFound, "user not found")
+		}
 	}
 
 	pas := make([]*pb.Article, 0, len(as))
@@ -187,7 +186,7 @@ func (h *Handler) GetArticles(ctx context.Context, req *pb.GetArticlesRequest) (
 		pas = append(pas, pa)
 	}
 
-	return &pb.ArticlesResponse{Articles: pas}, nil
+	return &pb.ArticlesResponse{Articles: pas, ArticlesCount: int32(len(pas))}, nil
 }
 
 // GetFeedArticles gets recent articles from users current user follow
@@ -248,7 +247,7 @@ func (h *Handler) GetFeedArticles(ctx context.Context, req *pb.GetFeedArticlesRe
 		pas = append(pas, pa)
 	}
 
-	return &pb.ArticlesResponse{Articles: pas}, nil
+	return &pb.ArticlesResponse{Articles: pas, ArticlesCount: int32(len(pas))}, nil
 }
 
 // UpdateArticle updates an article
@@ -311,7 +310,7 @@ func (h *Handler) UpdateArticle(ctx context.Context, req *pb.UpdateArticleReques
 	}
 
 	// get whether the article is current user's favorite
-	favorited := false
+	favorited := true
 	pa := article.ProtoArticle(favorited)
 
 	// get whether current user follows article author
@@ -484,22 +483,4 @@ func (h *Handler) UnfavoriteArticle(ctx context.Context, req *pb.UnfavoriteArtic
 	pa.Author = article.Author.ProtoProfile(following)
 
 	return &pb.ArticleResponse{Article: pa}, nil
-}
-
-// GetTags returns all of tags
-func (h *Handler) GetTags(ctx context.Context, req *pb.Empty) (*pb.TagsResponse, error) {
-	h.logger.Info().Msg("get tags")
-
-	tags, err := h.as.GetTags()
-	if err != nil {
-		h.logger.Error().Err(err).Msg("faield to get tags")
-		return nil, status.Error(codes.Aborted, "internal server error")
-	}
-
-	tagNames := make([]string, 0, len(tags))
-	for _, t := range tags {
-		tagNames = append(tagNames, t.Name)
-	}
-
-	return &pb.TagsResponse{Tags: tagNames}, nil
 }

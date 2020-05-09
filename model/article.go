@@ -4,10 +4,11 @@ import (
 	"fmt"
 
 	validation "github.com/go-ozzo/ozzo-validation"
-	"github.com/golang/protobuf/ptypes"
 	"github.com/jinzhu/gorm"
 	pb "github.com/raahii/golang-grpc-realworld-example/proto"
 )
+
+const iso8601 = "2006-01-02T15:04:05-0700Z"
 
 // Article model
 type Article struct {
@@ -18,7 +19,7 @@ type Article struct {
 	Tags           []Tag  `gorm:"many2many:article_tags"`
 	Author         User   `gorm:"foreignkey:UserID"`
 	UserID         uint   `gorm:"not null"`
-	FavoritesCount int64  `gorm:"not null;default=0"`
+	FavoritesCount int32  `gorm:"not null;default=0"`
 	FavoritedUsers []User `gorm:"many2many:favorite_articles"`
 	Comments       []Comment
 }
@@ -65,6 +66,8 @@ func (a *Article) ProtoArticle(favorited bool) *pb.Article {
 		Body:           a.Body,
 		FavoritesCount: a.FavoritesCount,
 		Favorited:      favorited,
+		CreatedAt:      a.CreatedAt.Format(iso8601),
+		UpdatedAt:      a.UpdatedAt.Format(iso8601),
 	}
 
 	// article tags
@@ -75,8 +78,6 @@ func (a *Article) ProtoArticle(favorited bool) *pb.Article {
 	pa.TagList = tags
 
 	// article dates
-	pa.CreatedAt, _ = ptypes.TimestampProto(a.CreatedAt)
-	pa.UpdatedAt, _ = ptypes.TimestampProto(a.UpdatedAt)
 
 	return &pa
 }

@@ -15,17 +15,17 @@ message Article {
   string description = 3;
   string body = 4;
   repeated string tagList = 5;
-  google.protobuf.Timestamp createdAt = 6;
-  google.protobuf.Timestamp updatedAt = 7;
+  string createdAt = 6;
+  string updatedAt = 7;
   bool favorited = 8;
-  int64 favoritesCount = 9;
+  int32 favoritesCount = 9;
   user.Profile author = 10;
 }
 
 message Comment {
   string id = 1;
-  google.protobuf.Timestamp createdAt = 2;
-  google.protobuf.Timestamp updatedAt = 3;
+  string createdAt = 2;
+  string updatedAt = 3;
   string body = 4;
   user.Profile author = 5;
 }
@@ -37,6 +37,11 @@ service Articles {
       body: "*"
     };
   }
+  rpc GetFeedArticles (GetFeedArticlesRequest) returns (ArticlesResponse) {
+    option (google.api.http) = {
+      get: "/articles/feed"
+    };
+  }
   rpc GetArticle (GetArticleRequest) returns (ArticleResponse) {
     option (google.api.http) = {
       get: "/articles/{slug}"
@@ -45,11 +50,6 @@ service Articles {
   rpc GetArticles (GetArticlesRequest) returns (ArticlesResponse) {
     option (google.api.http) = {
       get: "/articles"
-    };
-  }
-  rpc GetFeedArticles (GetFeedArticlesRequest) returns (ArticlesResponse) {
-    option (google.api.http) = {
-      get: "/articles/feed"
     };
   }
   rpc UpdateArticle (UpdateArticleRequest) returns (ArticleResponse) {
@@ -173,6 +173,7 @@ message ArticleResponse {
 
 message ArticlesResponse {
   repeated Article articles = 1;
+  int32 articlesCount = 2;
 }
 
 message TagsResponse {

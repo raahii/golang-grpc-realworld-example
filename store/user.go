@@ -56,6 +56,10 @@ func (s *UserStore) Update(m *model.User) error {
 
 // IsFollowing returns whether user A follows user B or not
 func (s *UserStore) IsFollowing(a *model.User, b *model.User) (bool, error) {
+	if a == nil || b == nil {
+		return false, nil
+	}
+
 	var count int
 	err := s.db.Table("follows").
 		Where("from_user_id = ? AND to_user_id = ?", a.ID, b.ID).

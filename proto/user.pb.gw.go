@@ -669,9 +669,9 @@ var (
 
 	pattern_Users_ShowProfile_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"profiles", "username"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Users_FollowUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"profiles", "username"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Users_FollowUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"profiles", "username", "follow"}, "", runtime.AssumeColonVerbOpt(true)))
 
-	pattern_Users_UnfollowUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1}, []string{"profiles", "username"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_Users_UnfollowUser_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"profiles", "username", "follow"}, "", runtime.AssumeColonVerbOpt(true)))
 )
 
 var (

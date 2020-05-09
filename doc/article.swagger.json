@@ -445,20 +445,18 @@
           }
         },
         "createdAt": {
-          "type": "string",
-          "format": "date-time"
+          "type": "string"
         },
         "updatedAt": {
-          "type": "string",
-          "format": "date-time"
+          "type": "string"
         },
         "favorited": {
           "type": "boolean",
           "format": "boolean"
         },
         "favoritesCount": {
-          "type": "string",
-          "format": "int64"
+          "type": "integer",
+          "format": "int32"
         },
         "author": {
           "$ref": "#/definitions/userProfile"
@@ -482,6 +480,10 @@
           "items": {
             "$ref": "#/definitions/articleArticle"
           }
+        },
+        "articlesCount": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -492,12 +494,10 @@
           "type": "string"
         },
         "createdAt": {
-          "type": "string",
-          "format": "date-time"
+          "type": "string"
         },
         "updatedAt": {
-          "type": "string",
-          "format": "date-time"
+          "type": "string"
         },
         "body": {
           "type": "string"

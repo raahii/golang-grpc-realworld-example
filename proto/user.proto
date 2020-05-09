@@ -57,13 +57,13 @@ service Users {
   }
   rpc FollowUser (FollowRequest) returns (ProfileResponse) {
     option (google.api.http) = {
-      post: "/profiles/{username}"
+      post: "/profiles/{username}/follow"
       body: "*"
     };
   }
   rpc UnfollowUser (UnfollowRequest) returns (ProfileResponse) {
     option (google.api.http) = {
-      delete: "/profiles/{username}"
+      delete: "/profiles/{username}/follow"
     };
   }
 }

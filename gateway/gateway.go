@@ -41,8 +41,8 @@ func run() error {
 		return err
 	}
 
-	log.Printf("starting gateway server on port 8080\n")
-	return http.ListenAndServe(":8080", mux)
+	log.Println("starting gateway server on port 3000")
+	return http.ListenAndServe(":3000", mux)
 }
 
 func main() {

@@ -105,6 +105,10 @@ func (s *ArticleStore) Delete(m *model.Article) error {
 
 // IsFavorited returns whether the article is favorited by the user
 func (s *ArticleStore) IsFavorited(a *model.Article, u *model.User) (bool, error) {
+	if a == nil || u == nil {
+		return false, nil
+	}
+
 	var count int
 	err := s.db.Table("favorite_articles").
 		Where("article_id = ? AND user_id = ?", a.ID, u.ID).
