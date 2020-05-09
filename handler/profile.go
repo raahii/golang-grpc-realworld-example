@@ -12,7 +12,7 @@ import (
 
 // ShowProfile gets a profile
 func (h *Handler) ShowProfile(ctx context.Context, req *pb.ShowProfileRequest) (*pb.ProfileResponse, error) {
-	h.logger.Info().Msgf("Show profile | req: %+v\n", req)
+	h.logger.Info().Interface("req", req).Msg("show profile")
 
 	userID, err := auth.GetUserID(ctx)
 	if err != nil {
@@ -45,7 +45,7 @@ func (h *Handler) ShowProfile(ctx context.Context, req *pb.ShowProfileRequest) (
 
 // FollowUser follow a user
 func (h *Handler) FollowUser(ctx context.Context, req *pb.FollowRequest) (*pb.ProfileResponse, error) {
-	h.logger.Info().Msgf("Follow User | req: %+v\n", req)
+	h.logger.Info().Interface("req", req).Msg("follow user")
 
 	userID, err := auth.GetUserID(ctx)
 	if err != nil {
@@ -84,7 +84,7 @@ func (h *Handler) FollowUser(ctx context.Context, req *pb.FollowRequest) (*pb.Pr
 
 // UnfollowUser unfollow a user
 func (h *Handler) UnfollowUser(ctx context.Context, req *pb.UnfollowRequest) (*pb.ProfileResponse, error) {
-	h.logger.Info().Msgf("Unfollow User | req: %+v\n", req)
+	h.logger.Info().Interface("req", req).Msg("unfollow user")
 
 	userID, err := auth.GetUserID(ctx)
 	if err != nil {

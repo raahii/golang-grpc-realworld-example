@@ -13,7 +13,7 @@ import (
 
 // LoginUser is existing user login
 func (h *Handler) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (*pb.UserResponse, error) {
-	h.logger.Info().Msg("login user")
+	h.logger.Info().Interface("req", req).Msg("login user")
 
 	u, err := h.us.GetByEmail(req.GetUser().GetEmail())
 	if err != nil {
@@ -41,7 +41,7 @@ func (h *Handler) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (*pb.
 
 // CreateUser registers a new user
 func (h *Handler) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.UserResponse, error) {
-	h.logger.Info().Msg("craete user")
+	h.logger.Info().Interface("req", req).Msg("create user")
 
 	u := model.User{
 		Username: req.User.GetUsername(),
@@ -86,7 +86,7 @@ func (h *Handler) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*p
 
 // CurrentUser gets a current user
 func (h *Handler) CurrentUser(ctx context.Context, req *pb.Empty) (*pb.UserResponse, error) {
-	h.logger.Info().Msg("get current user")
+	h.logger.Info().Interface("req", req).Msg("get current user")
 
 	userID, err := auth.GetUserID(ctx)
 	if err != nil {

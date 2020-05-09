@@ -29,7 +29,6 @@ func (u User) Validate() error {
 		validation.Field(
 			&u.Username,
 			validation.Required,
-			validation.Length(1, 10),
 			validation.Match(regexp.MustCompile("[a-zA-Z0-9]+")),
 		),
 		validation.Field(
@@ -40,7 +39,6 @@ func (u User) Validate() error {
 		validation.Field(
 			&u.Password,
 			validation.Required,
-			validation.Length(6, 100),
 		),
 	)
 }

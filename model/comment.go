@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	validation "github.com/go-ozzo/ozzo-validation"
-	"github.com/golang/protobuf/ptypes"
 	"github.com/jinzhu/gorm"
 	pb "github.com/raahii/golang-grpc-realworld-example/proto"
 )
@@ -31,14 +30,10 @@ func (c Comment) Validate() error {
 
 // ProtoComment generates proto comment model from article
 func (c *Comment) ProtoComment() *pb.Comment {
-	pc := pb.Comment{
-		Id:   fmt.Sprintf("%d", c.ID),
-		Body: c.Body,
+	return &pb.Comment{
+		Id:        fmt.Sprintf("%d", c.ID),
+		Body:      c.Body,
+		CreatedAt: c.CreatedAt.Format(iso8601),
+		UpdatedAt: c.UpdatedAt.Format(iso8601),
 	}
-
-	// article dates
-	pc.CreatedAt, _ = ptypes.TimestampProto(c.CreatedAt)
-	pc.UpdatedAt, _ = ptypes.TimestampProto(c.UpdatedAt)
-
-	return &pc
 }

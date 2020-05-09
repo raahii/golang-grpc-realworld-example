@@ -14,7 +14,7 @@ import (
 
 // CreateArticle creates a article
 func (h *Handler) CreateArticle(ctx context.Context, req *pb.CreateAritcleRequest) (*pb.ArticleResponse, error) {
-	h.logger.Info().Msgf("Create artcile | req: %+v\n", req)
+	h.logger.Info().Interface("req", req).Msg("create article")
 
 	userID, err := auth.GetUserID(ctx)
 	if err != nil {
@@ -74,7 +74,7 @@ func (h *Handler) CreateArticle(ctx context.Context, req *pb.CreateAritcleReques
 
 // GetArticle gets a article
 func (h *Handler) GetArticle(ctx context.Context, req *pb.GetArticleRequest) (*pb.ArticleResponse, error) {
-	h.logger.Info().Msgf("Get artcile | req: %+v\n", req)
+	h.logger.Info().Interface("req", req).Msg("get article")
 
 	// get article
 	articleID, err := strconv.Atoi(req.GetSlug())
@@ -129,7 +129,7 @@ func (h *Handler) GetArticle(ctx context.Context, req *pb.GetArticleRequest) (*p
 
 // GetArticles gets recent articles globally
 func (h *Handler) GetArticles(ctx context.Context, req *pb.GetArticlesRequest) (*pb.ArticlesResponse, error) {
-	h.logger.Info().Msgf("Get artciles | req: %+v\n", req)
+	h.logger.Info().Interface("req", req).Msg("get articles")
 
 	limitQuery := req.GetLimit()
 	if limitQuery == 0 {
@@ -192,7 +192,7 @@ func (h *Handler) GetArticles(ctx context.Context, req *pb.GetArticlesRequest) (
 
 // GetFeedArticles gets recent articles from users current user follow
 func (h *Handler) GetFeedArticles(ctx context.Context, req *pb.GetFeedArticlesRequest) (*pb.ArticlesResponse, error) {
-	h.logger.Info().Msgf("Get feed article | req: %+v\n", req)
+	h.logger.Info().Interface("req", req).Msg("get feed article")
 
 	userID, err := auth.GetUserID(ctx)
 	if err != nil {
@@ -253,7 +253,7 @@ func (h *Handler) GetFeedArticles(ctx context.Context, req *pb.GetFeedArticlesRe
 
 // UpdateArticle updates an article
 func (h *Handler) UpdateArticle(ctx context.Context, req *pb.UpdateArticleRequest) (*pb.ArticleResponse, error) {
-	h.logger.Info().Msgf("Update artcile | req: %+v\n", req)
+	h.logger.Info().Interface("req", req).Msg("update article")
 
 	userID, err := auth.GetUserID(ctx)
 	if err != nil {
@@ -328,7 +328,7 @@ func (h *Handler) UpdateArticle(ctx context.Context, req *pb.UpdateArticleReques
 
 // DeleteArticle deletes an article
 func (h *Handler) DeleteArticle(ctx context.Context, req *pb.DeleteArticleRequest) (*pb.Empty, error) {
-	h.logger.Info().Msgf("Delete artcile | req: %+v\n", req)
+	h.logger.Info().Interface("req", req).Msg("delete article")
 
 	userID, err := auth.GetUserID(ctx)
 	if err != nil {
@@ -378,7 +378,7 @@ func (h *Handler) DeleteArticle(ctx context.Context, req *pb.DeleteArticleReques
 
 // FavoriteArticle add an article to user favorites
 func (h *Handler) FavoriteArticle(ctx context.Context, req *pb.FavoriteArticleRequest) (*pb.ArticleResponse, error) {
-	h.logger.Info().Msgf("Favorite artcile | req: %+v\n", req)
+	h.logger.Info().Interface("req", req).Msg("favorite article")
 
 	userID, err := auth.GetUserID(ctx)
 	if err != nil {
@@ -433,7 +433,7 @@ func (h *Handler) FavoriteArticle(ctx context.Context, req *pb.FavoriteArticleRe
 
 // UnfavoriteArticle removes an article from user favorites
 func (h *Handler) UnfavoriteArticle(ctx context.Context, req *pb.UnfavoriteArticleRequest) (*pb.ArticleResponse, error) {
-	h.logger.Info().Msgf("Unfavorite artcile | req: %+v\n", req)
+	h.logger.Info().Interface("req", req).Msg("unfavorite article")
 
 	userID, err := auth.GetUserID(ctx)
 	if err != nil {

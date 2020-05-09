@@ -10,7 +10,7 @@ import (
 
 // GetTags returns all of tags
 func (h *Handler) GetTags(ctx context.Context, req *pb.Empty) (*pb.TagsResponse, error) {
-	h.logger.Info().Str("method", "GetTags")
+	h.logger.Info().Interface("req", req).Msg("get tags")
 
 	tags, err := h.as.GetTags()
 	if err != nil {
