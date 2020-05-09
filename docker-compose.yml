@@ -10,7 +10,7 @@ services:
     env_file:
       - "env/local.env"
     volumes:
-      - ".:/go/app"
+      - ".:/go/app:cached"
     links:
       - db
       - db-test

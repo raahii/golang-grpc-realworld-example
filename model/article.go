@@ -8,7 +8,7 @@ import (
 	pb "github.com/raahii/golang-grpc-realworld-example/proto"
 )
 
-const iso8601 = "2006-01-02T15:04:05-0700Z"
+const ISO8601 = "2006-01-02T15:04:05-0700Z"
 
 // Article model
 type Article struct {
@@ -66,8 +66,8 @@ func (a *Article) ProtoArticle(favorited bool) *pb.Article {
 		Body:           a.Body,
 		FavoritesCount: a.FavoritesCount,
 		Favorited:      favorited,
-		CreatedAt:      a.CreatedAt.Format(iso8601),
-		UpdatedAt:      a.UpdatedAt.Format(iso8601),
+		CreatedAt:      a.CreatedAt.Format(ISO8601),
+		UpdatedAt:      a.UpdatedAt.Format(ISO8601),
 	}
 
 	// article tags

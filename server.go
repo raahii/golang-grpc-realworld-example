@@ -6,6 +6,8 @@ import (
 	"os"
 
 	_ "github.com/go-sql-driver/mysql"
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	"github.com/raahii/golang-grpc-realworld-example/db"
 	"github.com/raahii/golang-grpc-realworld-example/handler"
 	pb "github.com/raahii/golang-grpc-realworld-example/proto"
@@ -46,7 +48,11 @@ func main() {
 		l.Panic().Err(fmt.Errorf("failed to listen: %w", err))
 	}
 
-	s := grpc.NewServer()
+	s := grpc.NewServer(
+		grpc_middleware.WithUnaryServerChain(
+			grpc_recovery.UnaryServerInterceptor(),
+		),
+	)
 	pb.RegisterUsersServer(s, h)
 	pb.RegisterArticlesServer(s, h)
 	l.Info().Str("port", port).Msg("starting server")

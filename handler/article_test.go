@@ -4,14 +4,22 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
-	"github.com/golang/protobuf/ptypes"
-	"github.com/google/uuid"
 	"github.com/raahii/golang-grpc-realworld-example/auth"
 	"github.com/raahii/golang-grpc-realworld-example/model"
 	pb "github.com/raahii/golang-grpc-realworld-example/proto"
 	"github.com/stretchr/testify/assert"
 )
+
+func dateStringToUnix(d string) (int64, error) {
+	t, err := time.Parse(model.ISO8601, d)
+	if err != nil {
+		return 0, err
+	}
+
+	return t.Unix(), nil
+}
 
 func TestCreateArticle(t *testing.T) {
 	h, cleaner := setUp(t)
@@ -31,11 +39,13 @@ func TestCreateArticle(t *testing.T) {
 
 	tests := []struct {
 		title    string
+		reqUser  *model.User
 		req      *pb.CreateAritcleRequest
 		hasError bool
 	}{
 		{
 			"create article: success",
+			&fooUser,
 			&pb.CreateAritcleRequest{
 				Article: &pb.CreateAritcleRequest_Article{
 					Title:       "awesome post!",
@@ -48,14 +58,18 @@ func TestCreateArticle(t *testing.T) {
 		},
 	}
 
+	requestTime := time.Now().Unix() - 1
 	for _, tt := range tests {
-		token, err := auth.GenerateToken(fooUser.ID)
-		if err != nil {
-			t.Error(err)
+		ctx := context.Background()
+		if tt.reqUser != nil {
+			token, err := auth.GenerateToken(tt.reqUser.ID)
+			if err != nil {
+				t.Error(err)
+			}
+
+			ctx = ctxWithToken(ctx, token)
 		}
 
-		ctx := ctxWithToken(context.Background(), token)
-		requestTime := ptypes.TimestampNow()
 		resp, err := h.CreateArticle(ctx, tt.req)
 		if tt.hasError {
 			if err == nil {
@@ -77,10 +91,19 @@ func TestCreateArticle(t *testing.T) {
 		assert.Equal(t, expected.GetDescription(), got.GetDescription())
 		assert.Equal(t, expected.GetBody(), got.GetBody())
 		assert.Equal(t, expected.GetTagList(), got.GetTagList())
-		assert.True(t, got.GetCreatedAt().GetNanos() > requestTime.GetNanos())
-		assert.True(t, got.GetUpdatedAt().GetNanos() > requestTime.GetNanos())
-		assert.False(t, got.GetFavorited())
-		assert.Equal(t, int64(0), got.GetFavoritesCount())
+		assert.True(t, got.GetFavorited())
+		assert.Equal(t, int32(0), got.GetFavoritesCount())
+
+		ct, err := dateStringToUnix(got.GetCreatedAt())
+		if err != nil {
+			t.Error(err)
+		}
+		ut, err := dateStringToUnix(got.GetUpdatedAt())
+		if err != nil {
+			t.Error(err)
+		}
+		assert.True(t, ct > requestTime)
+		assert.True(t, ut > requestTime)
 
 		author := got.GetAuthor()
 		assert.Equal(t, fooUser.Username, author.GetUsername())
@@ -202,7 +225,7 @@ func TestGetArticle(t *testing.T) {
 		}
 		assert.ElementsMatch(t, tags, got.GetTagList())
 		assert.Equal(t, tt.favorited, got.GetFavorited())
-		assert.Equal(t, int64(1), got.GetFavoritesCount())
+		assert.Equal(t, int32(1), got.GetFavoritesCount())
 
 		author := got.GetAuthor()
 		assert.Equal(t, fooUser.Username, author.GetUsername())
@@ -338,7 +361,7 @@ func TestGetArticles(t *testing.T) {
 			false,
 		},
 		{
-			"get articles with favorite query",
+			"get articles with favorited query",
 			&pb.GetArticlesRequest{
 				Tag:       "",
 				Author:    "",
@@ -654,10 +677,7 @@ func TestUpdateArticle(t *testing.T) {
 		assert.Equal(t, tt.expected.GetTitle(), got.GetTitle())
 		assert.Equal(t, tt.expected.GetDescription(), got.GetDescription())
 		assert.Equal(t, tt.expected.GetBody(), got.GetBody())
-
 		assert.ElementsMatch(t, tt.expected.GetTagList(), got.GetTagList())
-		assert.Equal(t, tt.expected.GetFavorited(), got.GetFavorited())
-		assert.Equal(t, tt.expected.GetFavoritesCount(), got.GetFavoritesCount())
 
 		gotAuthor := got.GetAuthor()
 		expAuthor := tt.expected.GetAuthor()
@@ -822,7 +842,7 @@ func TestFavoriteArticle(t *testing.T) {
 		},
 	}
 
-	var favoritesCount int64
+	var favoritesCount int32
 	for _, tt := range tests {
 		token, err := auth.GenerateToken(tt.reqUser.ID)
 		if err != nil {
@@ -894,7 +914,7 @@ func TestUnfavoriteArticle(t *testing.T) {
 		title          string
 		reqUser        *model.User
 		req            *pb.UnfavoriteArticleRequest
-		favoritesCount int64
+		favoritesCount int32
 		hasError       bool
 	}{
 		{
@@ -940,68 +960,4 @@ func TestUnfavoriteArticle(t *testing.T) {
 		assert.False(t, got.GetFavorited())
 		assert.Equal(t, tt.favoritesCount, got.GetFavoritesCount())
 	}
-}
-
-func TestGetTags(t *testing.T) {
-	h, cleaner := setUp(t)
-	defer cleaner(t)
-
-	fooUser := model.User{
-		Username: "foo",
-		Email:    "foo@example.com",
-		Password: "secret",
-	}
-
-	barUser := model.User{
-		Username: "bar",
-		Email:    "bar@example.com",
-		Password: "secret",
-	}
-
-	for _, u := range []*model.User{&fooUser, &barUser} {
-		if err := h.us.Create(u); err != nil {
-			t.Fatalf("failed to create initial user record: %v", err)
-		}
-	}
-
-	tags := make([]string, 0, 20)
-	for i := 0; i < 10; i++ {
-		idStr := fmt.Sprintf("%d", i)
-		a := model.Article{
-			Title:       idStr,
-			Description: idStr,
-			Body:        idStr,
-		}
-		if i < 5 {
-			a.Author = fooUser
-		} else {
-			a.Author = barUser
-		}
-
-		tag1 := uuid.New().String()
-		tag2 := uuid.New().String()
-		tags = append(tags, tag1)
-		tags = append(tags, tag2)
-
-		a.Tags = []model.Tag{
-			model.Tag{Name: tag1},
-			model.Tag{Name: tag2},
-		}
-
-		if err := h.as.Create(&a); err != nil {
-			t.Fatalf("failed to create initial article record: %v", err)
-		}
-	}
-
-	title := "get tags: success"
-	req := &pb.Empty{}
-	ctx := context.Background()
-	resp, err := h.GetTags(ctx, req)
-
-	if err != nil {
-		t.Errorf("%q expected to succeed, but failed. %v", title, err)
-		t.FailNow()
-	}
-
-	assert.ElementsMatch(t, resp.GetTags(), tags)
 }

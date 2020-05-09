@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
-	"github.com/golang/protobuf/ptypes"
 	"github.com/raahii/golang-grpc-realworld-example/auth"
 	"github.com/raahii/golang-grpc-realworld-example/model"
 	pb "github.com/raahii/golang-grpc-realworld-example/proto"
@@ -75,6 +75,7 @@ func TestCreateComment(t *testing.T) {
 		},
 	}
 
+	requestTime := time.Now().Unix() - 1
 	for _, tt := range tests {
 		ctx := context.Background()
 		if tt.reqUser != nil {
@@ -86,7 +87,6 @@ func TestCreateComment(t *testing.T) {
 			ctx = ctxWithToken(ctx, token)
 		}
 
-		requestTime := ptypes.TimestampNow()
 		resp, err := h.CreateComment(ctx, tt.req)
 		if tt.hasError {
 			if err == nil {
@@ -103,9 +103,17 @@ func TestCreateComment(t *testing.T) {
 
 		got := resp.GetComment()
 		assert.NotEmpty(t, got.GetId())
-		assert.True(t, got.GetCreatedAt().GetNanos() > requestTime.GetNanos())
-		assert.True(t, got.GetUpdatedAt().GetNanos() > requestTime.GetNanos())
 		assert.Equal(t, got.GetBody(), tt.req.GetComment().GetBody())
+		ct, err := dateStringToUnix(got.GetCreatedAt())
+		if err != nil {
+			t.Error(err)
+		}
+		ut, err := dateStringToUnix(got.GetUpdatedAt())
+		if err != nil {
+			t.Error(err)
+		}
+		assert.True(t, ct > requestTime)
+		assert.True(t, ut > requestTime)
 
 		author := got.GetAuthor()
 		assert.Equal(t, tt.reqUser.Username, author.GetUsername())

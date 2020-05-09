@@ -33,7 +33,7 @@ func (c *Comment) ProtoComment() *pb.Comment {
 	return &pb.Comment{
 		Id:        fmt.Sprintf("%d", c.ID),
 		Body:      c.Body,
-		CreatedAt: c.CreatedAt.Format(iso8601),
-		UpdatedAt: c.UpdatedAt.Format(iso8601),
+		CreatedAt: c.CreatedAt.Format(ISO8601),
+		UpdatedAt: c.UpdatedAt.Format(ISO8601),
 	}
 }

@@ -16,7 +16,7 @@ This codebase was created to demonstrate a fully fledged fullstack application b
 
 ## How it works
 
-![figure](https://user-images.githubusercontent.com/13511520/81163457-bff62700-8fc9-11ea-897a-60f27d9f9c8b.png)
+![figure](https://user-images.githubusercontent.com/13511520/81476790-bd583380-924e-11ea-99ba-63c973f121e5.png)
 
 
 
@@ -59,22 +59,24 @@ The app listens and serves on `0.0.0.0:3000`.
 
 
 
-## Test
+## Unit test
+  - docker-compose
 
-- docker-compose
+    ```
+    $ docker-compose run app make test
+    ```
 
-  ```
-  $ docker-compose run app go test ./...
-  ```
+  - local
+
+    ```
+    $ make test
+    ```
 
 
 
-- local
+## E2E test
 
-  ```
-  $ go test ./...
-  ```
-
+    $ make e2etest
 
 
 
@@ -104,5 +106,28 @@ The app listens and serves on `0.0.0.0:3000`.
   - [x] `POST /articles/{slug}/favorite`: Favorite an article
   - [x] `DELETE /articles/{slug}/favorite`: Unfavorite an article
 - [x] Deafult
-  - [x] `GET /tags`: Get tags
-
+  
+- [x] `GET /tags`: Get tags
+  
+- [x] E2E test
+  ```
+  ┌─────────────────────────┬───────────────────┬───────────────────┐
+  │                         │          executed │            failed │
+  ├─────────────────────────┼───────────────────┼───────────────────┤
+  │              iterations │                 1 │                 0 │
+  ├─────────────────────────┼───────────────────┼───────────────────┤
+  │                requests │                31 │                 0 │
+  ├─────────────────────────┼───────────────────┼───────────────────┤
+  │            test-scripts │                46 │                 0 │
+  ├─────────────────────────┼───────────────────┼───────────────────┤
+  │      prerequest-scripts │                17 │                 0 │
+  ├─────────────────────────┼───────────────────┼───────────────────┤
+  │              assertions │               345 │                 0 │
+  ├─────────────────────────┴───────────────────┴───────────────────┤
+  │ total run duration: 17.5s                                       │
+  ├─────────────────────────────────────────────────────────────────┤
+  │ total data received: 8.73KB (approx)                            │
+  ├─────────────────────────────────────────────────────────────────┤
+  │ average response time: 33ms [min: 10ms, max: 150ms, s.d.: 31ms] │
+  └─────────────────────────────────────────────────────────────────┘
+  ```
