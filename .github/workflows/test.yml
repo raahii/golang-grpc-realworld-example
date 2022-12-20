@@ -16,6 +16,9 @@ jobs:
       - name: Build
         run: go build -v ./...
 
+      - name: Lint
+        run: go vet ./...
+
       - name: Create database
         run: docker-compose up -d db-test
 
