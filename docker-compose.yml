@@ -10,21 +10,23 @@ services:
     env_file:
       - "env/local.env"
     volumes:
-      - ".:/go/app:cached"
+      - ".:/go/src/app"
     links:
       - db
       - db-test
+    command: ["go", "run", "server.go"]
 
   gateway:
     build:
       context: .
-      dockerfile: gateway/Dockerfile
+      dockerfile: Dockerfile
     ports:
       - "3000:3000"
     links:
       - app
     volumes:
-      - ".:/go/app"
+      - ".:/go/src/app"
+    command: ["go", "run", "gateway/gateway.go", "-endpoint", "app:50051"]
 
   db:
     image: mysql:latest

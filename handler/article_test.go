@@ -144,7 +144,7 @@ func TestGetArticle(t *testing.T) {
 		Title:       "awesome post!",
 		Description: "awesome description!",
 		Body:        "awesome content!",
-		Tags:        []model.Tag{model.Tag{Name: "hoge"}},
+		Tags:        []model.Tag{{Name: "hoge"}},
 		Author:      fooUser,
 	}
 
@@ -565,7 +565,7 @@ func TestUpdateArticle(t *testing.T) {
 		Description: "original desc",
 		Body:        "original body",
 		Author:      fooUser,
-		Tags:        []model.Tag{model.Tag{Name: "hoge"}},
+		Tags:        []model.Tag{{Name: "hoge"}},
 	}
 
 	af2 := model.Article{
@@ -573,7 +573,7 @@ func TestUpdateArticle(t *testing.T) {
 		Description: "original desc",
 		Body:        "original body",
 		Author:      fooUser,
-		Tags:        []model.Tag{model.Tag{Name: "hoge"}},
+		Tags:        []model.Tag{{Name: "hoge"}},
 	}
 
 	ab := model.Article{
@@ -581,7 +581,7 @@ func TestUpdateArticle(t *testing.T) {
 		Description: "original desc",
 		Body:        "original body",
 		Author:      barUser,
-		Tags:        []model.Tag{model.Tag{Name: "hoge"}},
+		Tags:        []model.Tag{{Name: "hoge"}},
 	}
 
 	for _, a := range []*model.Article{&af1, &af2, &ab} {
@@ -715,7 +715,7 @@ func TestDeleteArticle(t *testing.T) {
 		Description: "original desc",
 		Body:        "original body",
 		Author:      fooUser,
-		Tags:        []model.Tag{model.Tag{Name: "hoge"}},
+		Tags:        []model.Tag{{Name: "hoge"}},
 	}
 
 	ab := model.Article{
@@ -723,7 +723,7 @@ func TestDeleteArticle(t *testing.T) {
 		Description: "original desc",
 		Body:        "original body",
 		Author:      barUser,
-		Tags:        []model.Tag{model.Tag{Name: "hoge"}},
+		Tags:        []model.Tag{{Name: "hoge"}},
 	}
 
 	for _, a := range []*model.Article{&af, &ab} {
@@ -803,7 +803,7 @@ func TestFavoriteArticle(t *testing.T) {
 		Description: "original desc",
 		Body:        "original body",
 		Author:      fooUser,
-		Tags:        []model.Tag{model.Tag{Name: "hoge"}},
+		Tags:        []model.Tag{{Name: "hoge"}},
 	}
 
 	for _, a := range []*model.Article{&af} {
@@ -898,7 +898,7 @@ func TestUnfavoriteArticle(t *testing.T) {
 		Description: "original desc",
 		Body:        "original body",
 		Author:      fooUser,
-		Tags:        []model.Tag{model.Tag{Name: "hoge"}},
+		Tags:        []model.Tag{{Name: "hoge"}},
 	}
 
 	for _, a := range []*model.Article{&af} {

@@ -49,7 +49,7 @@ The app listens and serves on `0.0.0.0:3000`.
 
 - local
 
-  - Install Go 1.13+, MySQL
+  - Install Go 1.19+, MySQL
   - set environment variables to connect database [like this](https://github.com/raahii/golang-grpc-realworld-example/blob/master/env/local.env).
 
   ```
@@ -63,13 +63,13 @@ The app listens and serves on `0.0.0.0:3000`.
   - docker-compose
 
     ```
-    $ docker-compose run app make test
+    $ docker-compose run app make unittest
     ```
 
   - local
 
     ```
-    $ make test
+    $ make unittest
     ```
 
 

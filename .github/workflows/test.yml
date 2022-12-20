@@ -3,29 +3,21 @@ on: [push]
 name: test
 jobs:
   test:
-    strategy:
-      matrix:
-        go-version: [1.13.x]
-        platform: [ubuntu-latest]
-
-    runs-on: ${{ matrix.platform }}
+    runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v3
+
       - name: Install Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
-          go-version: ${{ matrix.go-version }}
+          go-version: 1.19
 
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Build
+        run: go build -v ./...
 
-      # - name: Cache modules
-      #   uses: actions/cache@v1
-      #   with:
-      #     path: /home/runner/go/pkg/mod
-      #     key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-go-
+      - name: Lint
+        run: go vet ./...
 
       - name: Create database
         run: docker-compose up -d db-test
