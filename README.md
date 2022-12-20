@@ -63,13 +63,13 @@ The app listens and serves on `0.0.0.0:3000`.
   - docker-compose
 
     ```
-    $ docker-compose run app make test
+    $ docker-compose run app make unittest
     ```
 
   - local
 
     ```
-    $ make test
+    $ make unittest
     ```
 
 
