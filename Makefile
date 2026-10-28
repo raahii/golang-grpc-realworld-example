@@ -1,4 +1,4 @@
-.PHONY: proto unittest e2etest
+.PHONY: proto test unittest e2etest
 proto:
 	protoc \
 		-I=/usr/local/include \
@@ -10,8 +10,10 @@ proto:
 		--swagger_out=logtostderr=true:./doc \
 		./proto/*.proto
 
+test: unittest
+
 unittest:
-	go test -v ./handler -parallel 4
+	go test -v ./auth ./model ./handler -parallel 4
 
 e2etest:
 	bash test/run-api-tests.sh
