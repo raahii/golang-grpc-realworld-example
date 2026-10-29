@@ -13,7 +13,10 @@ proto:
 test: unittest
 
 unittest:
-	go test -v ./auth ./model ./handler -parallel 4
+	go test -v ./auth ./model
+
+integration-test:
+	go test -v ./handler -parallel 4
 
 e2etest:
 	bash test/run-api-tests.sh
