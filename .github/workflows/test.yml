@@ -1,4 +1,4 @@
-on: [push]
+on: [push, pull_request]
 
 name: test
 jobs:
@@ -20,7 +20,9 @@ jobs:
         run: go vet ./...
 
       - name: Create database
-        run: docker-compose up -d db-test
+        run: |
+          docker compose up -d db-test
+          docker compose exec -T db-test sh -c 'until mysqladmin ping -h localhost -uroot -ppassword --silent; do sleep 1; done'
 
       - name: Test
         run: make test

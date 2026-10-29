@@ -56,7 +56,7 @@ func GetUserID(ctx context.Context) (uint, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &claims{}, func(token *jwt.Token) (interface{}, error) {
 		return jwtSecret, nil
 	})
-	if !token.Valid {
+	if token == nil || !token.Valid {
 		if ve, ok := err.(*jwt.ValidationError); ok {
 			if ve.Errors&jwt.ValidationErrorMalformed != 0 {
 				return 0, errors.New("invalid token: it's not even a token")
